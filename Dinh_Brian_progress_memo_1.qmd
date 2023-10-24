@@ -1,0 +1,62 @@
+---
+title: "Progress Memo 1"
+subtitle: |
+  | Final Project 
+  | Data Science 1 with R (STAT 301-1)
+author: "Brian Dinh"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    
+execute:
+  echo: true
+  warning: false
+
+from: markdown+emoji 
+---
+```{r}
+#| echo: false
+library(tidyverse)
+library(naniar)
+```
+
+## Github Repo Link
+
+To link to your github **repo**sitory, appropriately edit the example link below. Meaning replace `https://your-github-repo-url` with your github repo url. Suggest verifying the link works before submitting.
+
+[https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
+
+:::
+
+## Data source
+
+The data source is a Brooklyn Home Sales dataset, which describes the sales of all Brooklyn homes as recorded by the state of New York. The columns contain information about the home, neighborhood, when it was built, types of legal classes the house has, and much more, resulting in 111 columns of detailed information about each home. Here is the link to the dataset, which is from Kaggle and originates from the NYC gov website: https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data?select=brooklyn_sales_map.csv. I do not anticipate joining datasets together, unless I choose to expand the project to include 2018-2022.
+
+## Why this data
+
+I chose the Brooklyn housing dataset because I have an interest in housing prices in general and affordable real estate, which mainly stems from my experience researching housing inequities and issues in the Bay Area back in high school. I wanted to try analyzing houses in another part of the United States that is quite expensive, so I chose New York due to its general history of having high housing costs. I also believe working with 111 columns would be quite challenging and also leaves many insights to look at and analyze, allowing for an extensive exploratory data analysis. Specifically, I want to look at what neighborhoods are getting the highest increases in housing sale prices over time and see if there are any specific factors that may factor into these changes in housing sale prices, or if there seems to be a lot of movement towards specific places.
+
+## Data quality & complexity check
+
+There are 111 variables and 390,883 observations in the dataset. There are 32 categorical variables, 71 numerical variables, 7 logical variables, and 1 date variable.
+
+There are some missingness issues in the following columns: "easement", "ZoneDist2", "ZoneDist3", "ZoneDist4", "HistDist", and some columns related to mapping data. Based on looking at the data, I believe it is because these homes in Brooklyn are in specifically one zone, while the other five boroughs are other zones, so these columns are irrelevant.
+
+```{r}
+brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv")
+```
+```{r}
+head(brooklyn_sales, n = 5)
+```
+
+
+## Potential data issues
+
+The main issue I believe I will need to deal with is with cleaning the data, because even though it was processed already, there are still many NA values that can inhibit my exploratory data analysis. I will take steps to get rid of columns with many NA values that I deem "unnecessary" towards my analysis, primarily if the column is just about more aesthetic-based information (for example, I plan on removing the 'apartment_number' column because 78% of the values are missing). At the moment, my cut-off mark for columns with NA values is if more than 50% of the values are NA in that column (meaning I will remove them if >50%). Additionally, I think I have to work on cleaning data for the 'year_built' column as there are a significant number of values that are 0, which means there are no records for the actual building date. I may also need to convert some columns to a different type. For example, the "land_sqft" column needs to be converted to an integer.
+
+## Misc
+
+The majority of my analysis will focus on figuring out what columns relate the most to home sale price and how that differentiates over the years (or does not differentiate). 
