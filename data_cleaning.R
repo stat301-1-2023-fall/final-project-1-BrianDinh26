@@ -91,6 +91,9 @@ brooklyn_sales |>
        caption = "Source: NYC Department of Finance") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
+#based on these, there seems to be an increase in building prices that may correlate
+# with the lower sales after the recession... let's look into that
+
 #ok let's explore the peaks aka 2003 to 2006
 #what's your average home prices
 #what types of buildings are being sold the most? counts? tax_class?
