@@ -50,6 +50,28 @@ brooklyn_sales <- subset(brooklyn_sales, select = -c(borough,
                                                     boro_code,
                                                     owner_name))
 
+#consolidated data cleaning function
+brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |> 
+  clean_names() |> 
+  select(where(~mean(is.na(.)) < 0.5)) |> 
+  subset(
+    select = -c(
+      borough,
+      mappluto_f,
+      version,
+      pluto_map_id,
+      x_coord,
+      y_coord,
+      condo_no,
+      bbl,
+      boro_code,
+      owner_name
+    )
+  ) |> 
+  mutate(
+    land_sqft = as.numeric(land_sqft)
+  )
+
 # the bulk of my analysis will be based around housing price trends and what may
 # contribute to higher prices, what years had the most sales, distribution, etc.
 
@@ -92,14 +114,92 @@ brooklyn_sales |>
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 #based on these, there seems to be an increase in building prices that may correlate
-# with the lower sales after the recession... let's look into that
+# with the lower sales after the recession... let's look into that later too.
 
-#ok let's explore the peaks aka 2003 to 2006
-#what's your average home prices
+#ok let's explore the peaks aka 2003 to 2006 first. what's selling? why's it selling?
+
 #what types of buildings are being sold the most? counts? tax_class?
+#need to zoom in. it's mainly homes and apartments, also some interesting things with vacant land?
 brooklyn_sales |> 
   filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
-  
+  group_by(building_class_category) |> 
+  mutate(n = n()) |> 
+  ggplot(aes(y = fct_reorder(building_class_category, n))) +
+  geom_bar()
+
+#we also can look at tax classes, may be cleaner to look at.
+#as expected, the highest # of buildings sold are class 1. might not use this graph cause need to explain key.
+brooklyn_sales |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         is.na(tax_class) == FALSE) |> 
+  group_by(tax_class) |> 
+  mutate(n = n()) |> 
+  ggplot(aes(y = fct_reorder(tax_class, n))) +
+  geom_bar()
+
+#densities of prices? useless.
+brooklyn_sales |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
+  ggplot(aes(x = sale_price)) +
+  geom_density()
+
+# also let's look at avg prices of these types of buildings. (useless)
+brooklyn_sales |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
+  group_by(building_class_category) |> 
+  mutate(avg_building_class_price = mean(sale_price)) |> 
+  ggplot(aes(y = avg_building_class_price, x = building_class_category)) +
+  geom_point()
+
+#what's your average home prices? let's focus on residential, so anything w/ a 1 or 2
+#seem to converge around below 450k max! that's crazy to me.
+brooklyn_sales |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         tax_class == c("1", "1A", "1B", "1C", "2", "2A", "2B", "2C")) |> 
+  group_by(tax_class) |> 
+  ggplot(aes(y = tax_class, x = sale_price)) +
+  geom_boxplot() +
+  coord_cartesian(xlim = c(0, 1000000))
+
+#ok now i want to look at 2007-2010 range cause that's peak recession
+brooklyn_sales |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         is.na(tax_class) == FALSE) |> 
+  group_by(tax_class) |> 
+  mutate(n = n()) |> 
+  ggplot(aes(y = fct_reorder(tax_class, n))) +
+  geom_bar()
+
+#trends in the same way. housing still expensive though.
+#might be saying more about who CAN afford to buy though at the time.
+brooklyn_sales |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class == c("1", "1A", "1B", "1C", "2", "2A", "2B", "2C")) |> 
+  group_by(tax_class) |> 
+  ggplot(aes(y = tax_class, x = sale_price)) +
+  geom_boxplot() +
+  coord_cartesian(xlim = c(0, 1000000))
+
+#and lastly 2011-2017
+brooklyn_sales |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         is.na(tax_class) == FALSE) |> 
+  group_by(tax_class) |> 
+  mutate(n = n()) |> 
+  ggplot(aes(y = fct_reorder(tax_class, n))) +
+  geom_bar()
+#same trends, nothing special
+
+#BUT THE HOUSES HAVE JUMPED! for some. the most popular (2 and 1) sort of occupy
+#the same range.
+brooklyn_sales |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class == c("1", "1A", "1B", "1C", "2", "2A", "2B", "2C")) |> 
+  group_by(tax_class) |> 
+  ggplot(aes(y = tax_class, x = sale_price)) +
+  geom_boxplot() +
+  coord_cartesian(xlim = c(0, 1000000))
+
 
 #then recession graphs
 

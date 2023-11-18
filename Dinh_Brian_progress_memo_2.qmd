@@ -32,7 +32,6 @@ brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |>
   clean_names() |> 
   select(where(~mean(is.na(.)) < 0.5)) |> 
   subset(
-    brooklyn_sales,
     select = -c(
       borough,
       mappluto_f,
@@ -45,8 +44,22 @@ brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |>
       boro_code,
       owner_name
     )
+  ) |> 
+  mutate(
+    land_sqft = as.numeric(land_sqft)
   )
 ```
 
 ## Github Repo Link
 [https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
+
+## Progress Made
+
+Since the last 
+
+## Exploratory Data Analysis
+
+## Summary 
+
+## Self-Evaluation, Next Steps
+
