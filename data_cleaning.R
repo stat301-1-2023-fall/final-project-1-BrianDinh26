@@ -201,7 +201,55 @@ brooklyn_sales |>
   coord_cartesian(xlim = c(0, 1000000))
 
 
-#then recession graphs
+#ALSO, one thing to note is I want to see if the homes being sold were getting smaller if prices are same range.
+#square feet might not be applicable as heavily towards communal spaces, so let's just look at typical homes (1)
+brooklyn_sales |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class == c("1")) |> 
+  group_by(tax_class) |> 
+  ggplot(aes(y = tax_class, x = land_sqft)) +
+  geom_violin() +
+  labs(
+    title = "2011-2017 distribution of Square Ft in Sold Homes, Brooklyn"
+  )
+
+brooklyn_sales |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class == c("1")) |> 
+  group_by(tax_class) |> 
+  ggplot(aes(y = tax_class, x = land_sqft)) +
+  geom_violin() +
+  labs(
+    title = "2007-2010 distribution of Square Ft in Sold Homes, Brooklyn"
+  )
+
+brooklyn_sales |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         tax_class == c("1")) |> 
+  group_by(tax_class) |> 
+  select(land_sqft) |> 
+  summary()
+
+brooklyn_sales |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class == c("1")) |> 
+  group_by(tax_class) |> 
+  select(land_sqft) |> 
+  summary()
+  
+brooklyn_sales |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class == c("1")) |> 
+  group_by(tax_class) |> 
+  select(land_sqft) |> 
+  summary()
+
+#not many changes, maybe combine these into a single table...
+#doesn't seem to affect much
+
+#additionally, zip code analysis! do we buy more of a certain zip code. are they move $$$$
+
+
 
 #also may need to redo some parts to check historical districts and see if those are relatively more expensive.
 

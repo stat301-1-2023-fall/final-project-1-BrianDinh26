@@ -50,16 +50,18 @@ brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |>
   )
 ```
 
-## Github Repo Link
+# Introduction
 [https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
 
-## Progress Made
+# Data Cleaning
+Testing text.
 
-Since the last 
+# Exploratory Data Analysis
+## Initial Sales Analysis
 
-## Exploratory Data Analysis
+# What correlates with higher building sale prices?
 
-## Summary 
+# Summary and Conclusions Thus Far 
 
-## Self-Evaluation, Next Steps
+# Self-Evaluation, Next Steps
 
