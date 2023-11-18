@@ -363,6 +363,17 @@ brooklyn_sales |>
     axis.text.y = element_blank()
   )
 
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |>
+  summary()
        
 
 #last off, let's do some basic analyses involving school districts. are the most popular spots expensive?
@@ -386,6 +397,59 @@ brooklyn_sales |>
 
 #try age of the property, see if correlation w/ price...
 #probably a lubridate function... remove those w/ no date.
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |> 
+  mutate(
+    building_age = year_of_sale - year_built
+  ) |> 
+  filter(sale_price < 1000000,
+         building_age < 250) |> 
+  mutate(building_age = as.factor(building_age)) |> 
+  group_by(building_age) |> 
+  mutate(new_mean = mean(sale_price)) |> 
+  ggplot(aes(x = new_mean, y = building_age)) +
+  theme_minimal() +
+  geom_col() +
+  labs(
+    caption = "Source: NYC Department of Finance"
+  )
+  #theme(
+  ##  axis.title.y = element_blank(),
+  #  axis.text.y = element_blank()
+  #)
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |> 
+  mutate(
+    building_age = year_of_sale - year_built
+  ) |> 
+  filter(sale_price < 1000000,
+         building_age < 250) |> 
+  mutate(building_age = cut(
+    building_age,
+    breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
+  filter(is.na(building_age) == FALSE) |> 
+  group_by(building_age) |> 
+  ggplot(aes(y = building_age)) +
+  theme_minimal() +
+  geom_bar() +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
+    y = "Building\nAge\n(in years)",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
 
 
 #also may need to redo some parts to check historical districts and see if those are relatively more expensive.

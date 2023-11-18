@@ -160,7 +160,7 @@ brooklyn_sales |>
 
 Looking at the graph above, it is clear that non-residential buildings (tax class 4) skew the prices upwards, thus it makes sense to separate the buildings into primarily residential (tax class 1 and 2) and non-residential (tax class 4). Although we can see some price spikes from tax class 3, these types of buildings are hyper-specific and not relevant to my own questions of housing prices for the general public.
 
-Next up in my analysis, I want to circle back to my earlier question about "quality" of home, or essentially, is what people paying for homes actually changing how much space (square feet) they get or not? I used a violin plot to compare the distribution of square feet for residential buildings sold for the three defined periods of pre-recession, recession, and post-recession.
+Next up in my analysis, I want to circle back to my earlier question about "quality" of home, or essentially, is what people paying for homes actually changing how much space (square feet) they get or not? I used box plots to compare the distribution of square feet for residential buildings sold for the three defined periods of pre-recession, recession, and post-recession.
 ```{r}
 #| echo: false
 #2003-2006
@@ -178,7 +178,7 @@ brooklyn_sales |>
   theme_minimal() +
   geom_boxplot() +
   labs(
-    title = "2003-2006 distribution of Square Ft in Brooklyn Residential Building Sales",
+    title = "2003-2006 distribution of square ft in Brooklyn Residential Building Sales",
     caption = "Source: NYC Department of Finance",
     x = "Usable Square Feet"
   ) +
@@ -203,7 +203,7 @@ brooklyn_sales |>
   theme_minimal() +
   geom_boxplot() +
   labs(
-    title = "2007-2010 distribution of Square Ft in Brooklyn Residential Building Sales",
+    title = "2007-2010 distribution of square ft in Brooklyn Residential Building Sales",
     caption = "Source: NYC Department of Finance",
     x = "Usable Square Feet"
   ) +
@@ -228,7 +228,7 @@ brooklyn_sales |>
   theme_minimal() +
   geom_boxplot() +
   labs(
-    title = "2011-2017 distribution of Square Ft in Brooklyn Residential Building Sales",
+    title = "2011-2017 distribution of square ft in Brooklyn Residential Building Sales",
     caption = "Source: NYC Department of Finance",
     x = "Usable Square Feet"
   ) +
@@ -240,10 +240,41 @@ brooklyn_sales |>
 
 ```
 
+For all three time periods analyzed, the general distribution for each was from around 1800 square ft to 2700 square ft, with the median for all three time periods converging near 2000 square ft. This information signifies that despite residential building prices rising immensely over time in comparison to the 2003-2006 period, the general area in square feet of these buildings still remained the same, which may suggest that the rising cost of residential buildings could be a result of factors outside of the dataset, such as inflation, new ordinances, and more.
 
+Last off, for this progress memo at least, I wanted to analyze the distribution of residential building sales by age of the building, since my initial intution is that older buildings are sold more often due to reliability and cheapness in comparison to newer propreties. I calculated age by creating a new variable, `building_age` which subtracted the `year_built` from `year_sold`.
+```{r}
+#| echo: false
 
-
-
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |> 
+  mutate(
+    building_age = year_of_sale - year_built
+  ) |> 
+  filter(sale_price < 1000000,
+         building_age < 250) |> 
+  mutate(building_age = cut(
+    building_age,
+    breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
+  filter(is.na(building_age) == FALSE) |> 
+  group_by(building_age) |> 
+  ggplot(aes(y = building_age)) +
+  theme_minimal() +
+  geom_bar() +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
+    y = "Building\nAge\n(in years)",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+This graph does support my initial ideas about the bulk of residential buildings being sold typically being older in age, but I was still surprised by how the majority of these sold buildings are more than 75 years old. From here, I have questions about how much cheaper these older buildings are, or if they are relatively the same price as newer buildings, which will be further addressed in the final project.
 
 # Conclusions and next steps
 
