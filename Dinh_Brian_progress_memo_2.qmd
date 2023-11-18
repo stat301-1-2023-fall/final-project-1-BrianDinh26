@@ -29,7 +29,7 @@ library(naniar)
 library(janitor)
 library(visdat)
 library(ggthemes)
-
+#test
 #cleaned dataset
 brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |> 
   clean_names() |> 
