@@ -214,7 +214,8 @@ brooklyn_sales |>
   geom_violin() +
   labs(
     title = "2011-2017 distribution of Square Ft in Sold Homes, Brooklyn"
-  )
+  ) +
+  coord_cartesian(xlim = c(0, 5000))
 
 brooklyn_sales |> 
   filter(year_of_sale == c(2007, 2008, 2009, 2010),
