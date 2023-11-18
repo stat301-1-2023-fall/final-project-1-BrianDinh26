@@ -71,7 +71,9 @@ brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |>
   mutate(
     land_sqft = as.numeric(land_sqft),
     zip_code = as.factor(zip_code),
-    school_dist = as.factor(school_dist)
+    school_dist = as.factor(school_dist),
+    tax_class_at_sale = as.factor(tax_class_at_sale),
+    sale_date = as.Date(sale_date)
   )
 
 # the bulk of my analysis will be based around housing price trends and what may
@@ -267,6 +269,101 @@ brooklyn_sales |>
   filter(n > 12500) |> 
   ggplot(aes(x = sale_price, y = fct_reorder(zip_code, sale_price, .fun = sum))) +
   geom_col()
+
+#house price distribution, stacked barchart for TAX CLASS i should make later
+brooklyn_sales |> 
+  ggplot(aes(x = sale_date, y = sale_price, color = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_line(key_glyph = "timeseries") +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(x = "Sale Date",
+       y = "Sale Price",
+       title = "Distribution of Brooklyn Building Sales Over Time by Tax Class",
+       caption = "Source: NYC Department of Finance",
+       color = "Tax Class at Sale")
+
+#need to figure out a more efficient way to do cut with this graph.
+
+
+#redoing the violin plots using with residentials ONLY. more relevant.
+#need to merge the two first.
+
+#2003-2006
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2003-2006 distribution of Square Ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2007-2010
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2007-2010 distribution of Square Ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2011-2017
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2011-2017 distribution of Square Ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+       
 
 #last off, let's do some basic analyses involving school districts. are the most popular spots expensive?
 # let's use geom_segment cause that's more interesting.
