@@ -63,7 +63,7 @@ Since the previous memo, I have worked on cleaning the data and starting on expl
 
 
 # Data Cleaning
-For data cleaning, the code of which will not be shown in this document, I cleaned the column names using the `janitor::cleannames`, filtered out all the columns with over 50% of the values being NA, manually removed columns that I found to be irrelevant (like borough number and coordinate data), and manually converted variables to a more appropriate type, like converting ZIP code data into factor data. If you would like to see the code used for data cleaning, please refer to the `data_cleaning.R` file in the GitHub linked at the top of this document.
+For data cleaning, the code of which will not be shown in this document, I cleaned the column names using the `janitor::cleannames`, filtered out all the columns with over 50% of the values being NA, manually removed columns that I found to be irrelevant (like borough number and coordinate data), and manually converted variables to a more appropriate type, like converting ZIP code data into factor data. If you would like to see the code used for data cleaning, please refer to the `data_cleaning_and_exploration.R` file in the GitHub linked in the introduction, which contains data cleaning code in addition to some exploratory data analysis testing.
 
 # Exploratory Data Analysis
 The initial questions I had in mind in terms of this dataset were in regards to what affected the number of buildings being sold in Brooklyn over time and what variables could suggest a higher sales price for buildings in Brooklyn.
@@ -71,7 +71,7 @@ The initial questions I had in mind in terms of this dataset were in regards to 
 To start off, I wanted to look at the number of buildings sold in Brooklyn each year.
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 brooklyn_sales |> 
   group_by(year_of_sale) |> 
   ggplot() +
@@ -93,7 +93,7 @@ It seems that the highest number of sales happened in the cluster from 2003 to 2
 
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 brooklyn_sales |> 
   group_by(year_of_sale) |> 
   mutate(yearly_avg_price = mean(sale_price)) |> 
@@ -123,7 +123,7 @@ First off, I wanted to check what types of buildings were being sold, as the sta
 
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 brooklyn_sales |> 
   filter(is.na(tax_class_at_sale) == FALSE) |> 
   group_by(tax_class_at_sale) |> 
@@ -163,6 +163,7 @@ Looking at the graph above, it is clear that non-residential buildings (tax clas
 Next up in my analysis, I want to circle back to my earlier question about "quality" of home, or essentially, is what people paying for homes actually changing how much space (square feet) they get or not? I used box plots to compare the distribution of square feet for residential buildings sold for the three defined periods of pre-recession, recession, and post-recession.
 ```{r}
 #| echo: false
+#| eval: true
 #2003-2006
 brooklyn_sales |> 
   mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
@@ -245,6 +246,7 @@ For all three time periods analyzed, the general distribution for each was from 
 Last off, for this progress memo at least, I wanted to analyze the distribution of residential building sales by age of the building, since my initial intution is that older buildings are sold more often due to reliability and cheapness in comparison to newer propreties. I calculated age by creating a new variable, `building_age` which subtracted the `year_built` from `year_sold`.
 ```{r}
 #| echo: false
+#| eval: true
 
 brooklyn_sales |> 
   mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
@@ -277,4 +279,4 @@ brooklyn_sales |>
 This graph does support my initial ideas about the bulk of residential buildings being sold typically being older in age, but I was still surprised by how the majority of these sold buildings are more than 75 years old. From here, I have questions about how much cheaper these older buildings are, or if they are relatively the same price as newer buildings, which will be further addressed in the final project.
 
 # Conclusions and next steps
-
+So far, I have explored parts of my initial questions in regards to how the number of building sales are affected over time and certain factors that may affect it, such as building age, tax class, and cost. I am satisfied with my current look at building age count distributions and outlier analysis, and for the final project itself, I plan on exploring more intensely what variables may significantly affect the cost of residential buildings, which includes if it is in a historical district, what school district or zip code it is in, and more. Although I like the visualizations I have so far, I want to add more multivariate analyses and also work with stacked barcharts when it comes to the categorical variables in my dataset. Another curiosity I want to explore if possible is looking at tax class 4 (non-residential) building sales and prices during and after the recession, because I have a hunch that many buildings were sold for cheap to cover losses. I also want to make my graphs look more visually appealing for the final project, as right now, they are quite bare.
