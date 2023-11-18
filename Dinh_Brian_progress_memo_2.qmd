@@ -57,9 +57,15 @@ brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |>
   )
 ```
 
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
+
+:::
 
 # Introduction
-Since the previous memo, I have worked on cleaning the data and starting on exploratory data analysis. Here is [a link to my GitHub for this final project](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git). To repeat, the dataset I am using is a dataset containing information on Brooklyn Home Sales from 2003 to 2017. The dataset is from Kaggle that was sourced from the New York City Department of Finance. [Here is a link to the dataset.](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data) Additionally, [here is a glossary for the dataset](https://www.nyc.gov/site/finance/taxes/glossary-property-sales.page).
+Since the previous memo, I have worked on cleaning the data and starting on exploratory data analysis. To repeat, the dataset I am using is a dataset containing information on Brooklyn Home Sales from 2003 to 2017. The dataset is from Kaggle that was sourced from the New York City Department of Finance. [Here is a link to the dataset.](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data) Additionally, [here is a glossary for the dataset](https://www.nyc.gov/site/finance/taxes/glossary-property-sales.page).
 
 
 # Data Cleaning
