@@ -69,7 +69,9 @@ brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |>
     )
   ) |> 
   mutate(
-    land_sqft = as.numeric(land_sqft)
+    land_sqft = as.numeric(land_sqft),
+    zip_code = as.factor(zip_code),
+    school_dist = as.factor(school_dist)
   )
 
 # the bulk of my analysis will be based around housing price trends and what may
@@ -124,6 +126,7 @@ brooklyn_sales |>
   filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
   group_by(building_class_category) |> 
   mutate(n = n()) |> 
+  filter(n > 500) |> 
   ggplot(aes(y = fct_reorder(building_class_category, n))) +
   geom_bar()
 
@@ -248,7 +251,43 @@ brooklyn_sales |>
 #doesn't seem to affect much
 
 #additionally, zip code analysis! do we buy more of a certain zip code. are they move $$$$
+brooklyn_sales |> 
+  group_by(zip_code) |> 
+  mutate(n = n()) |> 
+  filter(n > 12500) |> 
+  ggplot(aes(y = fct_reorder(zip_code, n))) +
+  geom_bar()
 
+#need to work with fct_reorder??? not ordering right now
+#note: needed to change .fun = sum. :c
+brooklyn_sales |> 
+  group_by(zip_code) |> 
+  mutate(n = n()) |> 
+  filter(n > 12500) |> 
+  ggplot(aes(x = sale_price, y = fct_reorder(zip_code, sale_price, .fun = sum))) +
+  geom_col()
+
+#last off, let's do some basic analyses involving school districts. are the most popular spots expensive?
+# let's use geom_segment cause that's more interesting.
+brooklyn_sales |> 
+  filter(is.na(school_dist) == FALSE) |> 
+  group_by(school_dist) |> 
+  mutate(
+    n = n(),
+    avg_school_price = mean(sale_price)
+  ) |> 
+  ggplot(aes(x = school_dist, y = avg_school_price)) +
+  geom_col()
+
+#try some correlational exploration w/ price, do some graphs w/ geom_line
+brooklyn_sales |> 
+  ggplot(aes(y = gross_sqft, x = sale_price, alpha = 0.8)) + 
+  geom_line() +
+  geom_jitter() +
+  geom_line()
+
+#try age of the property, see if correlation w/ price...
+#probably a lubridate function... remove those w/ no date.
 
 
 #also may need to redo some parts to check historical districts and see if those are relatively more expensive.
