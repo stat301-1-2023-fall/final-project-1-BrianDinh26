@@ -1,7 +1,7 @@
 ---
 title: "Final Report on Brooklyn Housing Dataset (2003-2017)"
 subtitle: |
-  | Data Science 1 with R (STAT 301-1)
+  | Class: Data Science 1 with R (STAT 301-1)
 author: "Brian Dinh"
 date: today
 
@@ -13,27 +13,41 @@ format:
 execute:
   echo: true
   warning: false
-
+number-sections: true
 from: markdown+emoji 
 ---
-::: {.callout-tip icon=false}
 
+::: {.callout-tip icon="false"}
 ## Github Repo Link
-[https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
 
+<https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git>
 :::
 
-# Introduction
-For this report, I explored a dataset containing a 
+# Introduction {#sec-introduction}
+
+For this report, I explored a dataset labelled "[Brooklyn Home Sales 2003 to 2017](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data)," which describes information in regards to all buildings, residential and nonresidential, sold in the New York borough of Brooklyn. The data comes from the government of the state of New York, and links to the data can be found under References ([@sec-references]).
+
+For this exploratory data analysis, I was primarily motivated by my curiosity in what could be the main motivators for selling more buildings in the Brooklyn market, especially since buildings in this area tend to be more expensive than the rest of the United States due to its urbanity and access to New York City as a whole. Additionally, I wished to look at what factors could have affected housing price increases in the area. Last of all, I wanted to look at what areas in Brooklyn are the most desired based on the popularity in sales in this dataset and what neighborhoods have become less popular.
 
 # Data Overview and Quality
 
+For the original "Brooklyn Home Sales 2003 to 2017" dataset, there are 111 variables and 390,883 observations. There are 32 categorical variables, 71 numerical variables, 7 logical variables, and 1 date variable. 
+
+There are missingness issues for many columns associated with geographic mapping information, borough data (e.g. what borough the building is in), and some building information (like total units, building stories, etc.). Due to this missingness, I will not be able to construct a geographic visualizaiton of the data using a dashboard package like Shiny and may be limited in my analysis of nonresidential buildings, as thorough building information could affect nonresidential prices. I do not believe the missing borough data will affect my analysis because all of the buildings sold are located in Brooklyn.
+
+The dataset is not in the GitHub for this final project as it is too large (207.6 MB) to commit to the GitHub, so please refer to the hyperlink above in Introduction ([@sec-introduction]) for access to the dataset.
+
 # Explorations
 
-## What factors affect how many buildings are sold in Brooklyn over this time period?
+## What factors affect how many buildings are being sold in Brooklyn over this time period?
 
 ## What factors could affect housing prices based on the data?
 
+## What neighborhoods have become the most popular?
+
 # Conclusions
 
+# References {#sec-references}
+-   "Annualized Sales Update." NYC Department of Finance, New York City, [www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page](www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page).
+-   Wu, Tommy. "Brooklyn Home Sales, 2003 to 2017." Kaggle, 15 Feb. 2018, [www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data](www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data).
 

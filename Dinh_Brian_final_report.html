@@ -2991,14 +2991,16 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#data-overview-and-quality" id="toc-data-overview-and-quality" class="nav-link" data-scroll-target="#data-overview-and-quality">Data Overview and Quality</a></li>
-  <li><a href="#explorations" id="toc-explorations" class="nav-link" data-scroll-target="#explorations">Explorations</a>
+  <li><a href="#sec-introduction" id="toc-sec-introduction" class="nav-link active" data-scroll-target="#sec-introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#data-overview-and-quality" id="toc-data-overview-and-quality" class="nav-link" data-scroll-target="#data-overview-and-quality"><span class="header-section-number">2</span> Data Overview and Quality</a></li>
+  <li><a href="#explorations" id="toc-explorations" class="nav-link" data-scroll-target="#explorations"><span class="header-section-number">3</span> Explorations</a>
   <ul class="collapse">
-  <li><a href="#what-factors-affect-how-many-buildings-are-sold-in-brooklyn-over-this-time-period" id="toc-what-factors-affect-how-many-buildings-are-sold-in-brooklyn-over-this-time-period" class="nav-link" data-scroll-target="#what-factors-affect-how-many-buildings-are-sold-in-brooklyn-over-this-time-period">What factors affect how many buildings are sold in Brooklyn over this time period?</a></li>
-  <li><a href="#what-factors-could-affect-housing-prices-based-on-the-data" id="toc-what-factors-could-affect-housing-prices-based-on-the-data" class="nav-link" data-scroll-target="#what-factors-could-affect-housing-prices-based-on-the-data">What factors could affect housing prices based on the data?</a></li>
+  <li><a href="#what-factors-affect-how-many-buildings-are-being-sold-in-brooklyn-over-this-time-period" id="toc-what-factors-affect-how-many-buildings-are-being-sold-in-brooklyn-over-this-time-period" class="nav-link" data-scroll-target="#what-factors-affect-how-many-buildings-are-being-sold-in-brooklyn-over-this-time-period"><span class="header-section-number">3.1</span> What factors affect how many buildings are being sold in Brooklyn over this time period?</a></li>
+  <li><a href="#what-factors-could-affect-housing-prices-based-on-the-data" id="toc-what-factors-could-affect-housing-prices-based-on-the-data" class="nav-link" data-scroll-target="#what-factors-could-affect-housing-prices-based-on-the-data"><span class="header-section-number">3.2</span> What factors could affect housing prices based on the data?</a></li>
+  <li><a href="#what-neighborhoods-have-become-the-most-popular" id="toc-what-neighborhoods-have-become-the-most-popular" class="nav-link" data-scroll-target="#what-neighborhoods-have-become-the-most-popular"><span class="header-section-number">3.3</span> What neighborhoods have become the most popular?</a></li>
   </ul></li>
-  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions"><span class="header-section-number">4</span> Conclusions</a></li>
+  <li><a href="#sec-references" id="toc-sec-references" class="nav-link" data-scroll-target="#sec-references"><span class="header-section-number">5</span> References</a></li>
   </ul>
 </nav>
 </div>
@@ -3007,7 +3009,7 @@ vertical-align: -.125em;
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Final Report on Brooklyn Housing Dataset (2003-2017)</h1>
-<p class="subtitle lead"></p><p>Data Science 1 with R (STAT 301-1)</p><p></p>
+<p class="subtitle lead"></p><p>Class: Data Science 1 with R (STAT 301-1)</p><p></p>
 </div>
 
 
@@ -3044,26 +3046,41 @@ Github Repo Link
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><a href="https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git">https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git</a></p>
+<p><a href="https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git" class="uri">https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git</a></p>
 </div>
 </div>
-<section id="introduction" class="level1">
-<h1>Introduction</h1>
+<section id="sec-introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>For this report, I explored a dataset labelled “<a href="https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data">Brooklyn Home Sales 2003 to 2017</a>,” which describes information in regards to all buildings, residential and nonresidential, sold in the New York borough of Brooklyn. The data comes from the government of the state of New York, and links to the data can be found under References (<a href="#sec-references">Section 5</a>).</p>
+<p>For this exploratory data analysis, I was primarily motivated by my curiosity in what could be the main motivators for selling more buildings in the Brooklyn market, especially since buildings in this area tend to be more expensive than the rest of the United States due to its urbanity and access to New York City as a whole. Additionally, I wished to look at what factors could have affected housing price increases in the area. Last of all, I wanted to look at what areas in Brooklyn are the most desired based on the popularity in sales in this dataset and what neighborhoods have become less popular.</p>
 </section>
-<section id="data-overview-and-quality" class="level1">
-<h1>Data Overview and Quality</h1>
+<section id="data-overview-and-quality" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Data Overview and Quality</h1>
+<p>For the original “Brooklyn Home Sales 2003 to 2017” dataset, there are 111 variables and 390,883 observations. There are 32 categorical variables, 71 numerical variables, 7 logical variables, and 1 date variable.</p>
+<p>There are missingness issues for many columns associated with geographic mapping information, borough data (e.g. what borough the building is in), and some building information (like total units, building stories, etc.). Due to this missingness, I will not be able to construct a geographic visualizaiton of the data using a dashboard package like Shiny and may be limited in my analysis of nonresidential buildings, as thorough building information could affect nonresidential prices. I do not believe the missing borough data will affect my analysis because all of the buildings sold are located in Brooklyn.</p>
+<p>The dataset is not in the GitHub for this final project as it is too large (207.6 MB) to commit to the GitHub, so please refer to the hyperlink above in Introduction (<a href="#sec-introduction">Section 1</a>) for access to the dataset.</p>
 </section>
-<section id="explorations" class="level1">
-<h1>Explorations</h1>
-<section id="what-factors-affect-how-many-buildings-are-sold-in-brooklyn-over-this-time-period" class="level2">
-<h2 class="anchored" data-anchor-id="what-factors-affect-how-many-buildings-are-sold-in-brooklyn-over-this-time-period">What factors affect how many buildings are sold in Brooklyn over this time period?</h2>
+<section id="explorations" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Explorations</h1>
+<section id="what-factors-affect-how-many-buildings-are-being-sold-in-brooklyn-over-this-time-period" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="what-factors-affect-how-many-buildings-are-being-sold-in-brooklyn-over-this-time-period"><span class="header-section-number">3.1</span> What factors affect how many buildings are being sold in Brooklyn over this time period?</h2>
 </section>
-<section id="what-factors-could-affect-housing-prices-based-on-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="what-factors-could-affect-housing-prices-based-on-the-data">What factors could affect housing prices based on the data?</h2>
+<section id="what-factors-could-affect-housing-prices-based-on-the-data" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="what-factors-could-affect-housing-prices-based-on-the-data"><span class="header-section-number">3.2</span> What factors could affect housing prices based on the data?</h2>
+</section>
+<section id="what-neighborhoods-have-become-the-most-popular" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="what-neighborhoods-have-become-the-most-popular"><span class="header-section-number">3.3</span> What neighborhoods have become the most popular?</h2>
 </section>
 </section>
-<section id="conclusions" class="level1">
-<h1>Conclusions</h1>
+<section id="conclusions" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Conclusions</h1>
+</section>
+<section id="sec-references" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> References</h1>
+<ul>
+<li>“Annualized Sales Update.” NYC Department of Finance, New York City, <a href="www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page">www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page</a>.</li>
+<li>Wu, Tommy. “Brooklyn Home Sales, 2003 to 2017.” Kaggle, 15 Feb. 2018, <a href="www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data">www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data</a>.</li>
+</ul>
 </section>
 
 </main>
