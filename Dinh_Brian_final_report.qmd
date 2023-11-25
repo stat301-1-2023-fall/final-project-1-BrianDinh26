@@ -1,7 +1,6 @@
 ---
-title: "Final Report for Brooklyn Housing Dataset (2003-2017)"
+title: "Final Report on Brooklyn Housing Dataset (2003-2017)"
 subtitle: |
-  | Final Project 
   | Data Science 1 with R (STAT 301-1)
 author: "Brian Dinh"
 date: today
@@ -17,3 +16,24 @@ execute:
 
 from: markdown+emoji 
 ---
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
+
+:::
+
+# Introduction
+For this report, I explored a dataset containing a 
+
+# Data Overview and Quality
+
+# Explorations
+
+## What factors affect how many buildings are sold in Brooklyn over this time period?
+
+## What factors could affect housing prices based on the data?
+
+# Conclusions
+
+
