@@ -23,9 +23,25 @@ from: markdown+emoji
 <https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git>
 :::
 
+```{r}
+#| echo: false
+#import dataset and libraries at top of document
+
+#libraries
+library(tidyverse)
+library(naniar)
+library(janitor)
+library(visdat)
+library(ggthemes)
+
+#import dataset
+brooklyn_sales <- read_csv("data/brooklyn_sales_clean.csv")
+
+```
+
 # Introduction {#sec-introduction}
 
-For this report, I explored a dataset labelled "[Brooklyn Home Sales 2003 to 2017](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data)," which describes information in regards to all buildings, residential and nonresidential, sold in the New York borough of Brooklyn. The data comes from the government of the state of New York, and links to the data can be found under References ([@sec-references]).
+For this report, I explored a dataset labelled "[Brooklyn Home Sales 2003 to 2017](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data)," which describes information in regards to all buildings, residential and nonresidential, sold in the New York borough of Brooklyn. The data comes from the government of the state of New York, and links to the data can be found under References ([@sec-references]). Additionally, the cleaned dataset could not be uploaded to GitHub for the same reason, [so I have added a Google Drive link to it here](https://drive.google.com/drive/folders/1_OyRKj4xWoZ5CgJ5v0GhLubceh9yT5wW?usp=sharing).
 
 For this exploratory data analysis, I was primarily motivated by my curiosity in what could be the main motivators for selling more buildings in the Brooklyn market, especially since buildings in this area tend to be more expensive than the rest of the United States due to its urbanity and access to New York City as a whole. Additionally, I wished to look at what factors could have affected housing price increases in the area. Last of all, I wanted to look at what areas in Brooklyn are the most desired based on the popularity in sales in this dataset and what neighborhoods have become less popular.
 
