@@ -40,6 +40,13 @@ library(ggthemes)
 #import dataset
 brooklyn_sales <- read_csv("data/brooklyn_sales_clean.csv")
 
+#put these filterings in a SEPARATE CODE CHUNK LATER.
+brooklyn_sales_res <- brooklyn_sales |> 
+  filter(tax_class_at_sale == c("1", "2"))
+
+brooklyn_sales_nonres <- brooklyn_sales |> 
+  filter(tax_class_at_sale == c("3", "4"))
+
 ```
 
 # Introduction {#sec-introduction}
@@ -61,6 +68,62 @@ The cleaned dataset has 390,833 observations and 81 columns. There are 19 catego
 # Explorations
 
 ## What factors affect how many buildings are being sold in Brooklyn over this time period?
+WIP: Adding text to this graph later.
+```{r}
+#| echo: false
+
+brooklyn_sales_res |>
+  filter(sale_price > 10) |>
+  mutate(sale_price = cut(
+    sale_price,
+    breaks = c(
+      0,
+      200000,
+      300000,
+      400000,
+      500000,
+      600000,
+      700000,
+      800000,
+      900000,
+      1000000,
+      1250000,
+      1500000,
+      1750000,
+      2000000,
+      2500000,
+      3000000,
+      6000000
+    )
+  )) |>
+  filter(is.na(sale_price) == FALSE) |>
+  ggplot() +
+  geom_bar(aes(x = sale_price)) +
+  scale_x_discrete(
+    labels = c(
+      "< $200k",
+      "$200k-$300k",
+      "$300k-$400k",
+      "$400k-$500k",
+      "$500k-$600k",
+      "$600k-$700k",
+      "$700k-$800k",
+      "$800k-$900k",
+      "$900k-$1m",
+      "$1m-$1.25m",
+      "$1.25m-$1.5m",
+      "$1.5m-$1.75m",
+      "$1.75m-$2m",
+      "$2m-$2.5m",
+      "$2.5m-$3m",
+      "$3m-$6m"
+    )
+  ) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 4))
+```
+
 
 ## What factors affect housing prices based on the data?
 
