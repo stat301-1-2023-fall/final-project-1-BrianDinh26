@@ -23,19 +23,60 @@ brooklyn_sales_res <- brooklyn_sales |>
 brooklyn_sales_nonres <- brooklyn_sales |> 
   filter(tax_class_at_sale == c("3", "4"))
 
-#1. What factors affect how many buildings are being sold in Brooklyn over this time period?
 
 
+#1. How many buildings are being sold in Brooklyn over time? How have these sales changed? Where are they being sold?
 
+#actual first figure int his section will be the tax class one, why? Because being residential
+#or non-residential affects your price A TON. Outliers are bad, have separate analyses.
 
+#FIGURE 1 (combination of these 2 graphs of residential and noresidental sales, compared side-by-side)
+brooklyn_sales_res |> 
+  group_by(year_of_sale) |> 
+  ggplot() +
+  theme_minimal() +
+  geom_bar(aes(y = year_of_sale), fill ="#d3e3e1", color = "black") +
+  scale_y_reverse(breaks = c(2003, 2004, 2005, 2006,
+                             2007, 2008, 2009, 2010,
+                             2011, 2012, 2013, 2014,
+                             2015, 2016, 2017)) +
+  scale_x_continuous(labels = c("0", "5,000", "10,000", "15,000")) +
+  labs(title = "Number of Residential Building Sales in Brooklyn by Year",
+       subtitle = "From 2003 to 2017",
+       x = "Number of Sales",
+       y = "Year of\nSale",
+       caption = "Source: NYC Department of Finance") +
+  theme(
+    axis.title.y = element_text(angle = 0, 
+                                vjust = 0.5,
+                                margin = margin(t = 0, r = 10, b = 0, l = 0))
+  )
 
+brooklyn_sales_nonres |> 
+  group_by(year_of_sale) |> 
+  ggplot() +
+  theme_minimal() +
+  geom_bar(aes(y = year_of_sale), fill ="#e9f2b8", color = "black") +
+  scale_y_reverse(breaks = c(2003, 2004, 2005, 2006,
+                             2007, 2008, 2009, 2010,
+                             2011, 2012, 2013, 2014,
+                             2015, 2016, 2017)) +
+  labs(title = "Number of Non-Residential Building Sales in Brooklyn by Year",
+       subtitle = "From 2003 to 2017",
+       x = "Number of Sales",
+       y = "Year of\nSale",
+       caption = "Source: NYC Department of Finance") +
+  theme(
+    axis.title.y = element_text(angle = 0, 
+                                vjust = 0.5,
+                                margin = margin(t = 0, r = 10, b = 0, l = 0))
+  )
 
+#analysis says there's spikes for 2003-2006, lows for 2007-2010, resurgence 2010-2017.
 
-#2. What factors affect housing prices based on the data?
+# FIGURE 2. COMBINE w/ cowplot. prices lower, so more sales? but also cheaper yet less sales in recession
 
-# FIGURE 1, WILL COMBINE USING COWPLOT??? SHOULD BE SIDE BY SIDE
-
-# GRAPH OF SALES OVER TIME FOR RESIDENTIAL ONLY
+# GRAPH OF AVG SALE PRICE OVER TIME FOR RESIDENTIAL ONLY
 brooklyn_sales_res |> 
   group_by(year_of_sale) |> 
   mutate(yearly_avg_price = mean(sale_price)) |> 
@@ -73,5 +114,23 @@ brooklyn_sales_nonres |>
        caption = "Source: NYC Department of Finance") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
+# FIGURE 3: How many of each type of building (in terms of price bracket) is being sold in each time period?
 
-#3. What neighborhoods have become the most popular?
+# FIGURE 4: What areas are the most popular? (include a map) as reference for zip codes.
+
+# FIGURE 5: Old age and buildings? How many of each type of building in terms of age bracket are being sold
+# and how does age affect price? (2 figures really)
+
+#2. What factors affect housing prices based on the data?
+
+
+# FIGURE 1: Square ft, size, and # of units analysis.
+
+# FIGURE 2: Proximity analysis, facet wrap graph?
+
+# FIGURE 3: ZIP Code Analysis? Check if possible if they have same size or not (sq ft) and if there's a general thing.
+# Price per sq ft for each zip code?
+
+# Figure 4: School District Analysis? Unsure if any different from ZIP code, but explore!
+
+unique(brooklyn_sales$school_dist)
