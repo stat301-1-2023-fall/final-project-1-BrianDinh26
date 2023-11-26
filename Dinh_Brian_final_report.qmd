@@ -51,7 +51,9 @@ For the original "Brooklyn Home Sales 2003 to 2017" dataset, there are 111 varia
 
 There are missingness issues for many columns associated with geographic mapping information, borough data (e.g. what borough the building is in), and some building information (like total units, building stories, etc.). Due to this missingness, I will not be able to construct a geographic visualizaiton of the data using a dashboard package like Shiny and may be limited in my analysis of nonresidential buildings, as thorough building information could affect nonresidential prices. I do not believe the missing borough data will affect my analysis because all of the buildings sold are located in Brooklyn.
 
-The dataset is not in the GitHub for this final project as it is too large (207.6 MB) to commit to the GitHub, so please refer to the hyperlink above in Introduction ([@sec-introduction]) for access to the dataset.
+The dataset is not in the GitHub for this final project as it is too large (207.6 MB) to commit to the GitHub, so please refer to the hyperlink above in Introduction ([@sec-introduction]) for access to the original dataset and the cleaned dataset.
+
+The cleaned dataset has 390,833 observations and 81 columns. There are 19 categorical variables, 61 numeric variables, and 1 date variable.
 
 # Explorations
 
