@@ -267,12 +267,65 @@ brooklyn_sales_res |>
 
 
 # FIGURE 4: What areas are the most popular? (include a map) as reference for zip codes.
+#psuedo code is group by zip code, then mutate to get variable w/ count of zip code
+#in 2003, then a similar mutate to get variable w/ count of zip code in 2017.
+#mutate those 2 variables, 2017 divided by 2003 count, then percent (add label? for plot)
+#deviating bars horziontal?
+#ignore above that doesn't work cause there are just in general less buildings being sold
+#go with facet reordered ascending horizontal barchart w/ most popular zip codes, top 5
+
+#time-based analysis? or are the same things the most popular...
+
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
+  mutate(zip_code = as.factor(zip_code)) |> 
+  group_by(zip_code) |> 
+  mutate(n = n()) |> 
+  filter(n > 650) |> 
+  ggplot(aes(y = fct_reorder(zip_code, n))) +
+  geom_bar() +
+  labs(
+    title = "2003-2006 sales"
+  )
+
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010)) |> 
+  mutate(zip_code = as.factor(zip_code)) |> 
+  group_by(zip_code) |> 
+  mutate(n = n()) |> 
+  filter(n > 374) |> 
+  ggplot(aes(y = fct_reorder(zip_code, n))) +
+  geom_bar() +
+  labs(
+    title = "2007-2010 sales"
+  )
+
+
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |> 
+  mutate(zip_code = as.factor(zip_code)) |> 
+  group_by(zip_code) |> 
+  mutate(n = n()) |> 
+  filter(n > 400) |> 
+  ggplot(aes(y = fct_reorder(zip_code, n))) +
+  geom_bar() +
+  labs(
+    title = "2011-2017 sales"
+  )
+#generally the same areas tend to be popular it seems. closer to the water, the better?
 
 # FIGURE 5: Old age and buildings? How many of each type of building in terms of age bracket are being sold
 # and how does age affect price? (2 figures really)
+#scatterplot is possible here? age by building price maybe.
+
+#kind of similar to figure 2, but get average prices for each year then graph with line and
+# a geom_smooth line?
+
+
 
 #2. What factors affect housing prices based on the data?
 
+#changing price over time faceted by tax class type...?
 
 # FIGURE 1: Square ft, size, and # of units analysis.
 
