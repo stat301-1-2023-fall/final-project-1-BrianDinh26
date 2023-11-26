@@ -1,6 +1,10 @@
 # will delete this file before submission.
 # this is a cleaner version of data_cleaning_and_exploration.R
 
+#color scheme:
+#residential: #d3e3e1
+#non-residential: #e9f2b8
+
 #I do not want scientific notation for my graphs.
 options(scipen = 999)
 
@@ -118,7 +122,6 @@ brooklyn_sales_nonres |>
 
 # FIGURE 3: How many of each type of building (in terms of price bracket) is being sold in each time period?
 #need to make some facet cuts.
-#MAYBE go with multivariate histogram w/ color by tax class at sale???
 
 #base plot. expand into filter LATER and make tihs nice first.
 #also make colors prettier.
@@ -131,12 +134,16 @@ brooklyn_sales_res |>
   ) |> 
   filter(is.na(sale_price) == FALSE) |> 
   ggplot() +
-  geom_bar(aes(x = sale_price)) +
+  geom_bar(aes(x = sale_price), color = "black", fill = "#d3e3e1") +
   scale_x_discrete(
     labels = c("< $200k", "$200k-$300k", "$300k-$400k", "$400k-$500k", "$500k-$600k",
                "$600k-$700k", "$700k-$800k", "$800k-$900k", "$900k-$1m", "$1m-$1.25m",
                "$1.25m-$1.5m", "$1.5m-$1.75m", "$1.75m-$2m", "$2m-$2.5m", "$2.5m-$3m",
                "$3m-$6m")
+  ) +
+  scale_y_continuous(
+    breaks = c(0, 5000, 10000, 15000),
+    labels = c("0", "5,000", "10,000", "15,000")
   ) +
   theme_minimal() +
   theme(
@@ -144,13 +151,18 @@ brooklyn_sales_res |>
     axis.title.y = element_text(angle = 0, vjust = 0.5)
   ) +
   labs(
-    title = "Distribution of Count of Buildings Sold in Brooklyn by Price",
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "Overall (2003 to 2017)",
     x = "Sale Price Ranges",
     y = "Count"
   )
 
-brooklyn_sales |> 
-  filter(sale_price > 10) |>
+#year-by-year distribution
+
+#2003-2006
+brooklyn_sales_res |> 
+  filter(sale_price > 10,
+         year_of_sale == c(2003, 2004, 2005, 2006)) |>
   mutate(
     sale_price = cut(sale_price, breaks = c(0, 200000, 300000, 400000, 500000, 600000, 700000,
                                             800000, 900000, 1000000, 1250000, 1500000, 1750000,
@@ -158,24 +170,100 @@ brooklyn_sales |>
   ) |> 
   filter(is.na(sale_price) == FALSE) |> 
   ggplot() +
-  geom_bar(aes(x = sale_price, fill = tax_class_at_sale)) +
+  geom_bar(aes(x = sale_price), color = "black", fill = "#d3e3e1") +
   scale_x_discrete(
     labels = c("< $200k", "$200k-$300k", "$300k-$400k", "$400k-$500k", "$500k-$600k",
                "$600k-$700k", "$700k-$800k", "$800k-$900k", "$900k-$1m", "$1m-$1.25m",
                "$1.25m-$1.5m", "$1.5m-$1.75m", "$1.75m-$2m", "$2m-$2.5m", "$2.5m-$3m",
                "$3m-$6m")
   ) +
+  scale_y_continuous(
+    breaks = c(500, 1000, 1500, 2000)
+  ) +
+  coord_cartesian(ylim = c(0, 2000)) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(size = 4), # stick with 4 cause fits html well.
     axis.title.y = element_text(angle = 0, vjust = 0.5)
   ) +
   labs(
-    title = "Distribution of Count of Buildings Sold in Brooklyn by Price",
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "2003 to 2006",
     x = "Sale Price Ranges",
     y = "Count"
   )
-  
+
+#2007-2010
+brooklyn_sales_res |> 
+  filter(sale_price > 10,
+         year_of_sale == c(2007, 2008, 2009, 2010)) |>
+  mutate(
+    sale_price = cut(sale_price, breaks = c(0, 200000, 300000, 400000, 500000, 600000, 700000,
+                                            800000, 900000, 1000000, 1250000, 1500000, 1750000,
+                                            2000000, 2500000, 3000000, 6000000))
+  ) |> 
+  filter(is.na(sale_price) == FALSE) |> 
+  ggplot() +
+  geom_bar(aes(x = sale_price), color = "black", fill = "#d3e3e1") +
+  scale_x_discrete(
+    labels = c("< $200k", "$200k-$300k", "$300k-$400k", "$400k-$500k", "$500k-$600k",
+               "$600k-$700k", "$700k-$800k", "$800k-$900k", "$900k-$1m", "$1m-$1.25m",
+               "$1.25m-$1.5m", "$1.5m-$1.75m", "$1.75m-$2m", "$2m-$2.5m", "$2.5m-$3m",
+               "$3m-$6m")
+  ) +
+  scale_y_continuous(
+    breaks = c(500, 1000, 1500, 2000)
+  ) +
+  coord_cartesian(ylim = c(0, 2000)) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(size = 4), # stick with 4 cause fits html well.
+    axis.title.y = element_text(angle = 0, vjust = 0.5)
+  ) +
+  labs(
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "test to test",
+    x = "Sale Price Ranges",
+    y = "Count"
+  )
+
+#2011-2017
+brooklyn_sales_res |> 
+  filter(sale_price > 10,
+         year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |>
+  mutate(
+    sale_price = cut(sale_price, breaks = c(0, 200000, 300000, 400000, 500000, 600000, 700000,
+                                            800000, 900000, 1000000, 1250000, 1500000, 1750000,
+                                            2000000, 2500000, 3000000, 6000000))
+  ) |> 
+  filter(is.na(sale_price) == FALSE) |> 
+  ggplot() +
+  geom_bar(aes(x = sale_price), color = "black", fill = "#d3e3e1") +
+  scale_x_discrete(
+    labels = c("< $200k", "$200k-$300k", "$300k-$400k", "$400k-$500k", "$500k-$600k",
+               "$600k-$700k", "$700k-$800k", "$800k-$900k", "$900k-$1m", "$1m-$1.25m",
+               "$1.25m-$1.5m", "$1.5m-$1.75m", "$1.75m-$2m", "$2m-$2.5m", "$2.5m-$3m",
+               "$3m-$6m")
+  ) +
+  scale_y_continuous(
+    breaks = c(500, 1000, 1500, 2000)
+  ) +
+  coord_cartesian(ylim = c(0, 2000)) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(size = 4), # stick with 4 cause fits html well.
+    axis.title.y = element_text(angle = 0, vjust = 0.5)
+  ) +
+  labs(
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "2011 to 2017",
+    x = "Sale Price Ranges",
+    y = "Count"
+  )
+
+#need to make a fixed coord cartesian for each for PROPER comparison.
+# general conclusion is that people are successfully buying less, and despite
+# $400k-$500k being the consistent highest, there's a general upwards trend in price
 
 
 # FIGURE 4: What areas are the most popular? (include a map) as reference for zip codes.

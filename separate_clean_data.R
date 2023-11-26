@@ -3,7 +3,7 @@ library(tidyverse)
 library(janitor)
 #test
 #cleaned dataset
-brooklyn_sales_clean <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |> 
+brooklyn_sales_clean <- read_csv("data/raw/brooklyn_sales_map.csv", na = c("NA", "")) |> 
   clean_names() |> 
   select(where(~mean(is.na(.)) < 0.5)) |> 
   subset(
