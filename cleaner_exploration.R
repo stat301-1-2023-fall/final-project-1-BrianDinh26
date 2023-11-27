@@ -5,6 +5,8 @@
 #residential: #d3e3e1
 #non-residential: #e9f2b8
 
+#remember to have fig at start of the label for it to work.
+
 #I do not want scientific notation for my graphs.
 options(scipen = 999)
 
