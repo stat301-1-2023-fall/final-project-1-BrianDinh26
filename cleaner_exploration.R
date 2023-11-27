@@ -154,6 +154,14 @@ brooklyn_sales_nonres |>
 # FIGURE 3: How many of each type of building (in terms of price bracket) is being sold in each time period?
 #need to make some facet cuts.
 
+#attempt a histogram for this one i guess???
+
+brooklyn_sales |> 
+  filter(sale_price > 10) |> 
+  group_by(sale_price, tax_class_at_sale) |> 
+  ggplot(aes(x = sale_price)) +
+  geom_histogram(bins = 500000) + coord_cartesian(xlim = c(0, 3000000))
+
 #base plot. expand into filter LATER and make tihs nice first.
 #also make colors prettier.
 brooklyn_sales_res |> 
@@ -454,6 +462,38 @@ brooklyn_sales_res |>
   DT::formatRound(columns = 2, digits = 2) |> 
   DT::formatCurrency(columns = "Average", currency = "$")
 
+#modified function above
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    Average = mean(sale_price),
+    count = n()
+  ) |> 
+  filter(Average > 0) |> 
+  ggplot(aes(x = count, y = Average)) +
+  geom_point() + 
+  geom_jitter()
+
+#even weirder way to modify it, do it by average?
+#this will be the 2nd part of the figure, I guess.
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    avg_sale_n = mean(sale_price),
+    sq_avg = mean(land_sqft),
+    count = n()
+  ) |> 
+  filter(avg_sale_n > 0,
+         sq_avg < 10000) |> 
+  ggplot(aes(x = count, y = sq_avg, alpha = avg_sale_n)) +
+  geom_point() + 
+  geom_jitter()
+
+
 # Figure 4: School District Analysis? Unsure if any different from ZIP code, but explore!
+brooklyn_sales_res |> 
+  group_by(sch)
+
 
 class(brooklyn_sales$sale_price)
+class()
