@@ -430,8 +430,29 @@ brooklyn_sales_res |>
   
 # FIGURE 3: ZIP Code Analysis? Check if possible if they have same size or not (sq ft) and if there's a general thing.
 # Price per sq ft for each zip code?
-
 #WHAT NEIGHBORHOODS ARE THE MOST EXPENSIVE? ARE THEY THE SAME AS THE MOST POPULAR ONES?
+
+#might be a better way to visualize figure 4 in section 1 to be honest.
+
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    Average = mean(sale_price),
+    count = n()
+  ) |> 
+  filter(Average > 0) |> 
+  arrange(desc(Average)) |> 
+  DT::datatable(
+    colnames = c(
+      'Neighborhood' = 'neighborhood',
+      'Count Sold' = 'count'
+    ),
+    caption = htmltools::tags$caption(
+      style = 'caption-side: bottom; text-align: center;',
+      'Figure Whatever: ', htmltools::em('Brooklyn Neighborhoods Ranked by Average Residential Building Cost, 2003-2017.'))
+  ) |> 
+  DT::formatRound(columns = 2, digits = 2) |> 
+  DT::formatCurrency(columns = "Average", currency = "$")
 
 # Figure 4: School District Analysis? Unsure if any different from ZIP code, but explore!
 
