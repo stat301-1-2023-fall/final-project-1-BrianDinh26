@@ -66,6 +66,18 @@ brooklyn_sales |>
        color = "Tax Class at Sale") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
+#prologue figure 3
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = as.factor(tax_class_at_sale)) |> 
+  ggplot(aes(x = sale_date, y = land_sqft, color = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_line() +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(x = "Sale Date",
+       y = "Square Ft",
+       caption = "Source: NYC Department of Finance",
+       color = "Tax Class at Sale") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 #FIGURE 1 (combination of these 2 graphs of residential and noresidental sales, compared side-by-side)
 brooklyn_sales_res |> 
@@ -490,10 +502,3 @@ brooklyn_sales_res |>
   geom_jitter()
 
 
-# Figure 4: School District Analysis? Unsure if any different from ZIP code, but explore!
-brooklyn_sales_res |> 
-  group_by(sch)
-
-
-class(brooklyn_sales$sale_price)
-class()

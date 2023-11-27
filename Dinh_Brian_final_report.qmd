@@ -68,6 +68,76 @@ The cleaned dataset has 390,833 observations and 81 columns. There are 19 catego
 # Explorations
 
 ## What factors affect how many buildings are being sold in Brooklyn over this time period?
+
+Before exploring this question, I wanted to check to see the different types of buildings being sold in Brooklyn, because my initial hypothesis assumes that the building type can greatly affect certain data about the building. The variable of `tax_class_at_sale` categorizes the type of building sold into 4 categories according to the state of New York:
+
+* **(Class 1)**: Includes most residential property of up to three units (such as one-, two-, and three-family homes and small stores or offices with one or two attached apartments), vacant land that is zoned for residential use, and most condominiums that are not more than three stories.
+* **(Class 2)**: Includes all other property that is primarily residential, such as cooperatives and condominiums.
+* **(Class 3)**: Includes property with equipment owned by a gas, telephone or electric company.
+* **(Class 4)**: Includes all other properties not included in class 1,2, and 3, such as offices, factories, warehouses, garage buildings, etc.
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: fig-tax
+#| fig-cap: "Distributions of Building Tax Classes"
+#| fig-subcap:
+#|   - "Counts of Tax Classes of Buildings Sold in Brooklyn, 2003-2017"
+#|   - "Distribution of Brooklyn Building Sale Prices by Tax Class and Time, 2003-2017"
+#|   - "Distribution of Brooklyn Building Square Feet by Tax Class and Time, 2003-2017"
+#| layout-ncol: 1
+
+#figure 1a
+brooklyn_sales |> 
+  filter(is.na(tax_class_at_sale) == FALSE) |> 
+  group_by(tax_class_at_sale) |> 
+  mutate(tax_class_at_sale = as.factor(tax_class_at_sale),
+         n = n()) |>
+  ggplot(aes(y = fct_reorder(tax_class_at_sale, n), fill = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_bar() +
+  scale_x_continuous(label = scales::comma) +
+  labs(
+    y = "Tax Class\nAt Sale",
+    x = "Count",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
+        legend.position = "none")
+
+#figure 1b
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = as.factor(tax_class_at_sale)) |> 
+  ggplot(aes(x = sale_date, y = sale_price, color = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_line() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(x = "Sale Date",
+       y = "Sale Price",
+       caption = "Source: NYC Department of Finance",
+       color = "Tax Class\nat Sale") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+#figure 1c
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = as.factor(tax_class_at_sale)) |> 
+  ggplot(aes(x = sale_date, y = land_sqft, color = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_line() +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(x = "Sale Date",
+       y = "Square\nFt",
+       caption = "Source: NYC Department of Finance",
+       color = "Tax Class\nat Sale") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+  
+```
+
+According to @fig-tax-1, it appears that the most actively sold buildings are primarily residential buildings in classes 1 and 2, with class 4 buildings coming third and class 3 buldings not being sold too often. Additionally, class 4 buildings appear to cause large skews in both price and square feet, as according to @fig-tax-2 and @fig-tax-3, the majority of larger and more expensive buildings were class 4.
+
+Thus, I will separate my dataset into residential (class 1 and class 2) buildings and non-residential (class 3 and class 4) buildings, with the majority of my analysis focusing on the residential dataset.
+
+
 WIP: Adding text to this graph later.
 ```{r}
 #| echo: false
