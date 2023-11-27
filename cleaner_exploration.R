@@ -36,6 +36,37 @@ brooklyn_sales_nonres <- brooklyn_sales |>
 
 #also outlier demonstration with tax classes. 2 different figures at the start.
 
+#prologue figure #1:
+brooklyn_sales |> 
+  filter(is.na(tax_class_at_sale) == FALSE) |> 
+  group_by(tax_class_at_sale) |> 
+  mutate(n = n()) |>
+  ggplot(aes(y = fct_reorder(tax_class_at_sale, n), fill = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_bar() +
+  labs(
+    title = "2003-2017 Tax Classes of Buildings Sold in Brooklyn",
+    y = "Tax Class\nAt Sale",
+    x = "Count",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
+        legend.position = "none")
+
+#prologue figure 2
+brooklyn_sales |> 
+  ggplot(aes(x = sale_date, y = sale_price, color = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_line(key_glyph = "timeseries") +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(x = "Sale Date",
+       y = "Sale Price",
+       title = "Distribution of Brooklyn Building Sales Over Time by Tax Class",
+       caption = "Source: NYC Department of Finance",
+       color = "Tax Class at Sale") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+
 #FIGURE 1 (combination of these 2 graphs of residential and noresidental sales, compared side-by-side)
 brooklyn_sales_res |> 
   group_by(year_of_sale) |> 
@@ -212,7 +243,8 @@ brooklyn_sales_res |>
                "$3m-$6m")
   ) +
   scale_y_continuous(
-    breaks = c(500, 1000, 1500, 2000)
+    breaks = c(500, 1000, 1500, 2000),
+    labels = scales::comma
   ) +
   coord_cartesian(ylim = c(0, 2000)) +
   theme_minimal() +
@@ -276,6 +308,8 @@ brooklyn_sales_res |>
 
 #time-based analysis? or are the same things the most popular...
 
+#should use neighborhood instead! argh! more intelligible than zip code or school district.
+
 brooklyn_sales_res |> 
   filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
   mutate(zip_code = as.factor(zip_code)) |> 
@@ -313,6 +347,7 @@ brooklyn_sales_res |>
     title = "2011-2017 sales"
   )
 #generally the same areas tend to be popular it seems. closer to the water, the better?
+#WAIT JUST USE NEIGHBORHOOD FOR THIS
 
 # FIGURE 5: Old age and buildings? How many of each type of building in terms of age bracket are being sold
 # and how does age affect price? (2 figures really)
@@ -321,18 +356,82 @@ brooklyn_sales_res |>
 #kind of similar to figure 2, but get average prices for each year then graph with line and
 # a geom_smooth line?
 
+#FIRST part of figure
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |> 
+  mutate(
+    building_age = year_of_sale - year_built
+  ) |> 
+  filter(sale_price < 4000000,
+         building_age < 250) |> 
+  mutate(building_age = cut(
+    building_age,
+    breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
+  filter(is.na(building_age) == FALSE) |> 
+  group_by(building_age) |> 
+  ggplot(aes(y = building_age)) +
+  theme_minimal() +
+  scale_y_discrete(labels = c("0 to 15", "15 to 30", "30 to 45", "45 to 60",
+                              "60 to 75", "75 to 90", "90 to 105", "105 to 120")) +
+  scale_x_continuous(labels = scales::comma) +
+  geom_bar() +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
+    y = "Building\nAge\n(in years)",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+#SECOND part of figure
+brooklyn_sales_res |> 
+  mutate(building_age = year_of_sale - year_built) |> 
+  filter(sale_price < 4000000,
+         sale_price > 100,
+         building_age < 250) |> 
+  group_by(building_age) |> 
+  mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
+  ggplot(aes(x = building_age, y = age_avg_price)) +
+  geom_point() +
+  geom_jitter() +
+  geom_smooth(method = lm)
 
 
 #2. What factors affect housing prices based on the data?
+#need to beautify these graphs.
 
 #changing price over time faceted by tax class type...?
 
 # FIGURE 1: Square ft, size, and # of units analysis.
+brooklyn_sales_res |> 
+  filter(sale_price > 100,
+         gross_sqft > 15) |> 
+  ggplot(aes(x = sale_price, y = gross_sqft)) +
+  geom_point() +
+  geom_jitter() +
+  geom_smooth() +
+  coord_cartesian(xlim = c(0, 4000000), ylim = c(0, 10000))
 
 # FIGURE 2: Proximity analysis, facet wrap graph?
-
+#need to filter out NA...
+#give an explanation of proximity stuff in report.
+brooklyn_sales_res |> 
+  filter(prox_code == c("1", "2", "3")) |> 
+  mutate(prox_code = as.factor(prox_code)) |> 
+  group_by(year_of_sale, prox_code) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price, color = prox_code)) +
+  geom_line()
+  
 # FIGURE 3: ZIP Code Analysis? Check if possible if they have same size or not (sq ft) and if there's a general thing.
 # Price per sq ft for each zip code?
+
+#WHAT NEIGHBORHOODS ARE THE MOST EXPENSIVE? ARE THEY THE SAME AS THE MOST POPULAR ONES?
 
 # Figure 4: School District Analysis? Unsure if any different from ZIP code, but explore!
 
