@@ -4,7 +4,7 @@ subtitle: |
   | Class: Data Science 1 with R (STAT 301-1)
 author: "Brian Dinh"
 date: today
-
+fig-cap-location: top
 format:
   html:
     toc: true
@@ -79,7 +79,7 @@ Before exploring this question, I wanted to check to see the different types of 
 
 ```{r}
 #| echo: false
-#| eval: true
+#| eval: false
 #| label: fig-tax
 #| fig-cap: "Distributions of Building Sold in Brooklyn by Tax Classes"
 #| fig-subcap:
@@ -154,7 +154,7 @@ After separating the dataset, I wanted to look at how the number of sales for bu
 ```{r}
 #| label: fig-year-count
 #| echo: false
-#| eval: true
+#| eval: false
 #| fig-cap: Distribution of Brooklyn Building Sales by Year
 #| fig-subcap:
 #|   - "Number of Residential Building Sales in Brooklyn by Year"
@@ -205,13 +205,12 @@ In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Br
 ```{r}
 #| label: fig-sale-line
 #| echo: false
-#| eval: true
+#| eval: false
 #| fig-cap: Average Building Sale Prices by Year in Brooklyn
 #| fig-subcap:
 #|   - "Average Residential Building Sale Price by Year, Brooklyn"
 #|   - "Average Non-Residential Building Sale Price by Year, Brooklyn"
 #| layout-ncol: 1
-
 
 # GRAPH OF AVG SALE PRICE OVER TIME FOR RESIDENTIAL ONLY
 brooklyn_sales_res |> 
@@ -249,9 +248,245 @@ brooklyn_sales_nonres |>
        caption = "Source: NYC Department of Finance") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
+(add a more thorough explanation with a segue into next graph here later. tldr my hypothesis was wrong, less sales were in a time of cheaper buildings? why so? let's look year by year for the reasons why or at least explanationish)
+```{r}
+#| label: fig-price-cuts
+#| echo: false
+#| eval: false
+#| fig-cap: "Distribution of Count of Residential Buildings Sold in Brooklyn by Price"
+#| fig-subcap:
+#|   - "2003-2006"
+#|   - "2007-2010"
+#|   - "2011-2017"
+#| layout-ncol: 1
 
+#2003-2006
+brooklyn_sales_res |>
+  filter(sale_price > 10,
+         year_of_sale == c(2003, 2004, 2005, 2006)) |>
+  mutate(sale_price = cut(
+    sale_price,
+    breaks = c(
+      0,
+      200000,
+      300000,
+      400000,
+      500000,
+      600000,
+      700000,
+      800000,
+      900000,
+      1000000,
+      1250000,
+      1500000,
+      1750000,
+      2000000,
+      2500000,
+      3000000,
+      6000000
+    )
+  )) |>
+  filter(is.na(sale_price) == FALSE) |>
+  ggplot() +
+  geom_bar(aes(x = sale_price),
+           color = "black",
+           fill = "#d3e3e1") +
+  scale_x_discrete(
+    labels = c(
+      "< $200k",
+      "$200k-$300k",
+      "$300k-$400k",
+      "$400k-$500k",
+      "$500k-$600k",
+      "$600k-$700k",
+      "$700k-$800k",
+      "$800k-$900k",
+      "$900k-$1m",
+      "$1m-$1.25m",
+      "$1.25m-$1.5m",
+      "$1.5m-$1.75m",
+      "$1.75m-$2m",
+      "$2m-$2.5m",
+      "$2.5m-$3m",
+      "$3m-$6m"
+    )
+  ) +
+  scale_y_continuous(breaks = c(500, 1000, 1500, 2000)) +
+  coord_cartesian(ylim = c(0, 2000)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 4),
+        # stick with 4 cause fits html well.
+        axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  labs(
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "2003 to 2006",
+    x = "Sale Price Ranges",
+    y = "Count"
+  )
+
+#2007-2010
+brooklyn_sales_res |>
+  filter(sale_price > 10,
+         year_of_sale == c(2007, 2008, 2009, 2010)) |>
+  mutate(sale_price = cut(
+    sale_price,
+    breaks = c(
+      0,
+      200000,
+      300000,
+      400000,
+      500000,
+      600000,
+      700000,
+      800000,
+      900000,
+      1000000,
+      1250000,
+      1500000,
+      1750000,
+      2000000,
+      2500000,
+      3000000,
+      6000000
+    )
+  )) |>
+  filter(is.na(sale_price) == FALSE) |>
+  ggplot() +
+  geom_bar(aes(x = sale_price),
+           color = "black",
+           fill = "#d3e3e1") +
+  scale_x_discrete(
+    labels = c(
+      "< $200k",
+      "$200k-$300k",
+      "$300k-$400k",
+      "$400k-$500k",
+      "$500k-$600k",
+      "$600k-$700k",
+      "$700k-$800k",
+      "$800k-$900k",
+      "$900k-$1m",
+      "$1m-$1.25m",
+      "$1.25m-$1.5m",
+      "$1.5m-$1.75m",
+      "$1.75m-$2m",
+      "$2m-$2.5m",
+      "$2.5m-$3m",
+      "$3m-$6m"
+    )
+  ) +
+  scale_y_continuous(breaks = c(500, 1000, 1500, 2000),
+                     labels = scales::comma) +
+  coord_cartesian(ylim = c(0, 2000)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 4),
+        # stick with 4 cause fits html well.
+        axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  labs(
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "test to test",
+    x = "Sale Price Ranges",
+    y = "Count"
+  )
+
+#2011-2017
+brooklyn_sales_res |>
+  filter(sale_price > 10,
+         year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |>
+  mutate(sale_price = cut(
+    sale_price,
+    breaks = c(
+      0,
+      200000,
+      300000,
+      400000,
+      500000,
+      600000,
+      700000,
+      800000,
+      900000,
+      1000000,
+      1250000,
+      1500000,
+      1750000,
+      2000000,
+      2500000,
+      3000000,
+      6000000
+    )
+  )) |>
+  filter(is.na(sale_price) == FALSE) |>
+  ggplot() +
+  geom_bar(aes(x = sale_price),
+           color = "black",
+           fill = "#d3e3e1") +
+  scale_x_discrete(
+    labels = c(
+      "< $200k",
+      "$200k-$300k",
+      "$300k-$400k",
+      "$400k-$500k",
+      "$500k-$600k",
+      "$600k-$700k",
+      "$700k-$800k",
+      "$800k-$900k",
+      "$900k-$1m",
+      "$1m-$1.25m",
+      "$1.25m-$1.5m",
+      "$1.5m-$1.75m",
+      "$1.75m-$2m",
+      "$2m-$2.5m",
+      "$2.5m-$3m",
+      "$3m-$6m"
+    )
+  ) +
+  scale_y_continuous(breaks = c(500, 1000, 1500, 2000)) +
+  coord_cartesian(ylim = c(0, 2000)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 4),
+        # stick with 4 cause fits html well.
+        axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  labs(
+    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
+    subtitle = "2011 to 2017",
+    x = "Sale Price Ranges",
+    y = "Count"
+  )
+```
+(general tldr is that for the 2007-2010 time period the most popular homes were still the 400kish range ones, it's just that there were significantly less homes sold at higher prices)
 
 ## What neighborhoods are the most popular in Brooklyn?
+
+(info introducing how many neighborhoods brooklyn has. give a map (externally sourced need to cite in the references) showing a map of neighborhoods).
+
+*start with table that sorts by count sold. shows that top 10 only has park slope as common in both most expensive and most popular. 
+```{r}
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    Average = mean(sale_price),
+    count = n()
+  ) |> 
+  filter(Average > 0) |> 
+  arrange(desc(count)) |> 
+  DT::datatable(
+    colnames = c(
+      'Neighborhood' = 'neighborhood',
+      'Count Sold' = 'count'
+    ),
+    caption = htmltools::tags$caption(
+      style = 'caption-side: bottom; text-align: center;',
+      'Table: ', htmltools::em('Brooklyn Neighborhoods Ranked by Count of Buildings Sold, 2003-2017.'))
+  ) |> 
+  DT::formatRound(columns = 2, digits = 2) |> 
+  DT::formatCurrency(columns = "Average", currency = "$")
+```
+
+
+*then go with figure with 3 barplots showing off neighborhood popualrity over 3 time periods. tldr is that they don't change very much, sameish 3/4 neighborhoods dominate the top 5.)
+
+
+
 
 ## What affects price for housing?
 

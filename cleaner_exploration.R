@@ -468,21 +468,42 @@ brooklyn_sales_res |>
   filter(sale_price > 100,
          gross_sqft > 15) |> 
   ggplot(aes(x = sale_price, y = gross_sqft)) +
-  geom_point() +
-  geom_jitter() +
+  geom_point(alpha = 0.5) +
+  geom_jitter(alpha = 0.5) +
   geom_smooth() +
-  coord_cartesian(xlim = c(0, 4000000), ylim = c(0, 10000))
+  theme_minimal() +
+  coord_cartesian(xlim = c(0, 4000000), ylim = c(0, 10000)) +
+  labs(
+    y = "Gross\nSquare Ft",
+    x = "Sale Price"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  scale_x_continuous(label = scales::dollar_format()) +
+  scale_y_continuous(label = scales::comma_format())
 
 # FIGURE 2: Proximity analysis, facet wrap graph?
 #need to filter out NA...
 #give an explanation of proximity stuff in report.
+#also may need to relabel proximity codes.
 brooklyn_sales_res |> 
   filter(prox_code == c("1", "2", "3")) |> 
-  mutate(prox_code = as.factor(prox_code)) |> 
+  mutate(prox_code = as.factor(prox_code),
+         prox_code = fct_collapse(prox_code,
+                                 "Detached" = "1",
+                                 "Semi-attached" = "2",
+                                 "Attached" = "3")) |> 
   group_by(year_of_sale, prox_code) |> 
   mutate(yearly_avg_price = mean(sale_price)) |> 
   ggplot(aes(x = year_of_sale, y = yearly_avg_price, color = prox_code)) +
-  geom_line()
+  geom_line() +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Average\nSale\nPrice"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  scale_y_continuous(label = scales::dollar_format()) +
+  scale_x_continuous(label = scales::comma_format())
   
 # FIGURE 3: ZIP Code Analysis? Check if possible if they have same size or not (sq ft) and if there's a general thing.
 # Price per sq ft for each zip code?
