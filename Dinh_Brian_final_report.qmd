@@ -200,13 +200,60 @@ brooklyn_sales_nonres |>
                                 margin = margin(t = 0, r = 10, b = 0, l = 0))
   )
 ```
-In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Brooklyn tended to be the highest from 2003 to 2006, while there was a significant dip in sales from 2007 to 2010, which was stronger for residential buildings than it was for non-residential buildings. From to 2011 to 2017, there appears to have been a recovery in building sales. These three time periods are interesting to look at in terms of determining if the three time periods had the same trends or not. For example, one immediate question I had was if the decrease in sales was due to an increase or decrease in price in the building market.
+In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Brooklyn tended to be the highest from 2003 to 2006, while there was a significant dip in sales from 2007 to 2010, which was stronger for residential buildings than it was for non-residential buildings. From to 2011 to 2017, there appears to have been a recovery in building sales. These three time periods are interesting to look at in terms of determining if the three time periods had the same trends or not. For example, one immediate question I had was if the decrease in sales was due to an increase or decrease in price in the building market. To analyze this, I made the following line plots.
 
-## What factors affect housing prices based on the data?
+```{r}
+#| label: fig-sale-line
+#| echo: false
+#| eval: true
+#| fig-cap: Average Building Sale Prices by Year in Brooklyn
+#| fig-subcap:
+#|   - "Average Residential Building Sale Price by Year, Brooklyn"
+#|   - "Average Non-Residential Building Sale Price by Year, Brooklyn"
+#| layout-ncol: 1
 
-## What neighborhoods have become the most popular?
 
-# Conclusions
+# GRAPH OF AVG SALE PRICE OVER TIME FOR RESIDENTIAL ONLY
+brooklyn_sales_res |> 
+  group_by(year_of_sale) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price)) +
+  theme_minimal() + 
+  geom_line(color ="#d3e3e1", linewidth = 2) +
+  geom_point(color ="black", size = 2) +
+  scale_x_continuous(breaks = c(2003, 2005, 2007,
+                                2009, 2011, 2013,
+                                2015, 2017)) + 
+  scale_y_continuous(breaks = c(200000, 400000, 600000, 800000),
+                     labels = c("$200,000", "$400,000", "$600,000", "$800,000")) +
+  labs(y = "Price ($)",
+       x = "Year",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+# GRAPH OF SALES OVER TIME FOR NON-RESIDENTIAL ONLY
+brooklyn_sales_nonres |> 
+  group_by(year_of_sale) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price)) +
+  theme_minimal() +
+  geom_line(color = "#e9f2b8", linewidth = 2) +
+  geom_point(color = "black", size = 2) +
+  scale_x_continuous(breaks = c(2003, 2005, 2007,
+                                2009, 2011, 2013,
+                                2015, 2017)) + 
+  scale_y_continuous(breaks = c(400000, 800000, 1200000, 1600000, 2000000),
+                     labels = c("$400,000", "$800,000", "$1,200,000", "$1,600,000", "2,000,000")) +
+  labs(y = "Price ($)",
+       x = "Year",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+
+## What neighborhoods are the most popular in Brooklyn?
+
+## What affects price for housing?
 
 # References {#sec-references}
 -   "Annualized Sales Update." NYC Department of Finance, New York City, [www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page](www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page).

@@ -356,7 +356,6 @@ brooklyn_sales_res |>
     title = "2007-2010 sales"
   )
 
-
 brooklyn_sales_res |> 
   filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |> 
   mutate(zip_code = as.factor(zip_code)) |> 
@@ -370,6 +369,41 @@ brooklyn_sales_res |>
   )
 #generally the same areas tend to be popular it seems. closer to the water, the better?
 #WAIT JUST USE NEIGHBORHOOD FOR THIS
+#neighborhood version
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
+  group_by(neighborhood) |> 
+  mutate(n = n()) |> 
+  filter(n > 650) |> 
+  ggplot(aes(y = fct_reorder(neighborhood, n))) +
+  geom_bar() +
+  labs(
+    title = "2003-2006 sales"
+  )
+
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010)) |> 
+  group_by(neighborhood) |> 
+  mutate(n = n()) |> 
+  filter(n > 350) |> 
+  ggplot(aes(y = fct_reorder(neighborhood, n))) +
+  geom_bar() +
+  labs(
+    title = "2007-2010 sales"
+  )
+
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |> 
+  group_by(neighborhood) |> 
+  mutate(n = n()) |> 
+  filter(n > 385) |> 
+  ggplot(aes(y = fct_reorder(neighborhood, n))) +
+  geom_bar() +
+  labs(
+    title = "2011-2017 sales"
+  )
+
+
 
 # FIGURE 5: Old age and buildings? How many of each type of building in terms of age bracket are being sold
 # and how does age affect price? (2 figures really)
