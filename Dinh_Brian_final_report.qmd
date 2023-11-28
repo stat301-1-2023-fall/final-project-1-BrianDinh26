@@ -197,7 +197,7 @@ In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Br
 ```{r}
 #| label: fig-sale-line
 #| echo: false
-#| eval: true
+#| eval: false
 #| fig-cap: Average Building Sale Prices by Year in Brooklyn
 #| fig-subcap:
 #|   - "Average Residential Building Sale Price by Year, Brooklyn"
@@ -245,7 +245,7 @@ Looking at @fig-sale-line-1 and @fig-sale-line-2, it appears that the average sa
 ```{r}
 #| label: fig-price-cuts
 #| echo: false
-#| eval: true
+#| eval: false
 #| fig-cap: "Distribution of Count of Residential Buildings Sold in Brooklyn by Price"
 #| fig-subcap:
 #|   - "2003-2006"
@@ -447,16 +447,28 @@ brooklyn_sales_res |>
   )
 ```
 
-In @fig-price-cuts-1, @fig-price-cuts-2, and @fice-price-cuts-3, the most common selling price in Brooklyn ranges from the $300k to $500k range, with this being the most prominent within @fig-price-cuts-1. However, with @fig-price-cuts-2, the number of homes sold at slightly above the $300k to $500k range significantly decreased, which could have caused the average price decreases for this time period. Within the 2011 to 2017 range, there has been a more subtle increase in properties being sold in the $700k to $1m range despite buildings in the $300k to $500k range being the most common, which could explain the immense increases in residential building prices over time.
+In @fig-price-cuts-1, @fig-price-cuts-2, and @fig-price-cuts-3, the most common selling price in Brooklyn ranges from the $300k to $500k range, with this being the most prominent within @fig-price-cuts-1. However, with @fig-price-cuts-2, the number of homes sold at slightly above the $300k to $500k range significantly decreased, which could have caused the average price decreases for this time period. Within the 2011 to 2017 range, there has been a more subtle increase in properties being sold in the $700k to $1m range despite buildings in the $300k to $500k range being the most common, which could explain the immense increases in residential building prices over time.
 
-NOTE: CONSIDER ADDING NON-RESIDENTIAL ANALYSIS OF BUILDINGS SOLD WITH PRICE CUTS
+**NOTE: CONSIDER ADDING NON-RESIDENTIAL ANALYSIS OF BUILDINGS SOLD WITH PRICE CUTS**
+
+## What affects the price for buildings?
+For the next part of my EDA, I wanted to look at what affects the price of buildings in Brooklyn. 
 
 ## What neighborhoods are the most popular in Brooklyn?
 
-(info introducing how many neighborhoods brooklyn has. give a map (externally sourced need to cite in the references) showing a map of neighborhoods).
+Another aspect that I wanted to analyze in the data is what neighborhoods are the most popular in Brooklyn and where people tend to buy property. There are an estimated 77 neighborhoods in Brooklyn, although the dataset only gives 61. A rough map for these neighborhoods can be seen below:
 
-*start with table that sorts by count sold. shows that top 10 only has park slope as common in both most expensive and most popular. 
+![Neighborhood Map of Brooklyn](images/brooklyn_neighborhoods.png)
+
+
+First off, I want to look at the neighborhoods with the highest number of residential buildings sold from 2003 to 2017, including the mean price of these properties.
 ```{r}
+#| label: fig-table
+#| echo: false
+#| eval: true
+#| fig-cap: "Brooklyn Neighborhoods Ranked by Count of Residential Buildings Sold, 2003-2017"
+#| layout-ncol: 1
+
 brooklyn_sales_res |> 
   group_by(neighborhood) |> 
   summarise(
@@ -470,22 +482,72 @@ brooklyn_sales_res |>
     colnames = c(
       'Neighborhood' = 'neighborhood',
       'Count Sold' = 'count'
-    ),
-    caption = htmltools::tags$caption(
-      style = 'caption-side: bottom; text-align: center;',
-      'Table: ', htmltools::em('Brooklyn Neighborhoods Ranked by Count of Buildings Sold, 2003-2017.'))
+    )
   ) |> 
   DT::formatRound(columns = 2, digits = 2) |> 
   DT::formatCurrency(columns = "Average", currency = "$")
 ```
 
+From @fig-table, it appears that the most popular neighborhoods are not the most expensive ones, with the only neighborhood appearing in both the top 10 for count of residential buildings sold and average building price being Park Slope. Rather, these active neighborhoods tend to be lower in price in comparison to the overall averages as seen in @fig-sale-line-1. This information may indicate that these neighborhoods might be quite active in terms of moving ownership or at least might not be seen as places to stay "permanently."
 
-*then go with figure with 3 barplots showing off neighborhood popualrity over 3 time periods. tldr is that they don't change very much, sameish 3/4 neighborhoods dominate the top 5.)
+Next, I wanted to see if the most popular neighborhoods changed depending on the time period.
+```{r}
+#| label: fig-neighbor-bar
+#| echo: false
+#| eval: true
+#| fig-cap: "Distribution of Sales by Neighborhoods in Brooklyn"
+#| fig-subcap:
+#|   - "2003-2006"
+#|   - "2007-2010"
+#|   - "2011-2017"
+#| layout-ncol: 1
+
+
+#2003-2006
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
+  group_by(neighborhood) |> 
+  mutate(n = n()) |> 
+  filter(n > 650) |> 
+  ggplot(aes(y = fct_reorder(neighborhood, n))) +
+  geom_bar() +
+  labs(
+    title = "2003-2006 sales"
+  )
+
+#2007-2010
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010)) |> 
+  group_by(neighborhood) |> 
+  mutate(n = n()) |> 
+  filter(n > 350) |> 
+  ggplot(aes(y = fct_reorder(neighborhood, n))) +
+  geom_bar() +
+  labs(
+    title = "2007-2010 sales"
+  )
+
+#2011-2017
+brooklyn_sales_res |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |> 
+  group_by(neighborhood) |> 
+  mutate(n = n()) |> 
+  filter(n > 385) |> 
+  ggplot(aes(y = fct_reorder(neighborhood, n))) +
+  geom_bar() +
+  labs(
+    title = "2011-2017 sales"
+  )
+```
+**THESE GRAPHS ARE UGLY FIX THEM AFTER**
+
+Looking at @fig-neighbor-bar-1, @fig-neighbor-bar-2, and @fig-neighbor-bar-3, the neighborhoods of Bedford Stuyvesant, East New York, Bay Ridge, and Borough Park are the most sold residential properties in Brooklyn, which makes sense as these properties are generally cheaper than the overall average prices for residential housing in Brooklyn. However, comparing @fig-neighbor-bar-1 and @fig-table, the neighborhood of Crown Heights appears to be an outlier, as it is relatively higher in price ($519,171.17) yet also getting increasingly popular.
+
+**consider expanding analysis to nonresidential buildings**
 
 
 
 
-## What affects price for housing?
 
 # References {#sec-references}
 -   "Annualized Sales Update." NYC Department of Finance, New York City, [www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page](www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page).
