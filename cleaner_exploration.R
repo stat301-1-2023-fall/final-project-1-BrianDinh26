@@ -271,7 +271,7 @@ brooklyn_sales_res |>
   coord_cartesian(ylim = c(0, 2000)) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(size = 4), # stick with 4 cause fits html well.
+    axis.text.x = element_text(size = 4),
     axis.title.y = element_text(angle = 0, vjust = 0.5)
   ) +
   labs(
@@ -376,10 +376,13 @@ brooklyn_sales_res |>
   mutate(n = n()) |> 
   filter(n > 650) |> 
   ggplot(aes(y = fct_reorder(neighborhood, n))) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1") +
+  theme_minimal() +
   labs(
-    title = "2003-2006 sales"
-  )
+    y = "Neighborhood",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 brooklyn_sales_res |> 
   filter(year_of_sale == c(2007, 2008, 2009, 2010)) |> 
@@ -387,10 +390,13 @@ brooklyn_sales_res |>
   mutate(n = n()) |> 
   filter(n > 350) |> 
   ggplot(aes(y = fct_reorder(neighborhood, n))) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1") +
+  theme_minimal() +
   labs(
-    title = "2007-2010 sales"
-  )
+    y = "Neighborhood",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 brooklyn_sales_res |> 
   filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017)) |> 
@@ -398,10 +404,13 @@ brooklyn_sales_res |>
   mutate(n = n()) |> 
   filter(n > 385) |> 
   ggplot(aes(y = fct_reorder(neighborhood, n))) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1") +
+  theme_minimal() +
   labs(
-    title = "2011-2017 sales"
-  )
+    y = "Neighborhood",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 
 
@@ -435,7 +444,7 @@ brooklyn_sales |>
   scale_y_discrete(labels = c("0 to 15", "15 to 30", "30 to 45", "45 to 60",
                               "60 to 75", "75 to 90", "90 to 105", "105 to 120")) +
   scale_x_continuous(labels = scales::comma) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1", color = "black") +
   labs(
     caption = "Source: NYC Department of Finance",
     title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
@@ -456,7 +465,15 @@ brooklyn_sales_res |>
   ggplot(aes(x = building_age, y = age_avg_price)) +
   geom_point() +
   geom_jitter() +
-  geom_smooth(method = lm)
+  geom_smooth(method = lm) +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    x = "Building Age",
+    y = "Average Sale\nPrice"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+  
 
 
 #2. What factors affect housing prices based on the data?
@@ -493,42 +510,72 @@ brooklyn_sales_res |>
 #need to filter out NA...
 #give an explanation of proximity stuff in report.
 #also may need to relabel proximity codes.
-brooklyn_sales_res |> 
-  filter(prox_code == c("1", "2", "3")) |> 
-  mutate(prox_code = as.factor(prox_code),
-         prox_code = fct_collapse(prox_code,
-                                 "Detached" = "1",
-                                 "Semi-attached" = "2",
-                                 "Attached" = "3")) |> 
-  group_by(year_of_sale, prox_code) |> 
-  mutate(yearly_avg_price = mean(sale_price)) |> 
+brooklyn_sales_res |>
+  filter(prox_code == c("1", "2", "3")) |>
+  mutate(
+    prox_code = as.factor(prox_code),
+    prox_code = fct_collapse(
+      prox_code,
+      "Detached" = "1",
+      "Semi-attached" = "2",
+      "Attached" = "3"
+    )
+  ) |>
+  group_by(year_of_sale, prox_code) |>
+  mutate(yearly_avg_price = mean(sale_price)) |>
   ggplot(aes(x = year_of_sale, y = yearly_avg_price, color = prox_code)) +
   geom_line() +
   theme_minimal() +
-  labs(
-    x = "Year",
-    y = "Average\nSale\nPrice"
-  ) +
-  theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-  scale_y_continuous(label = scales::dollar_format())
+  labs(x = "Year",
+       y = "Average\nSale\nPrice") +
+  theme(axis.title.y = element_text(
+    angle = 0,
+    vjust = 0.5,
+    margin = margin(
+      t = 0,
+      r = 10,
+      b = 0,
+      l = 0
+    )
+  )) +
+  scale_y_continuous(label = scales::dollar_format()) +
+  scale_color_discrete(name = "Proximity Code")
 
-brooklyn_sales_res |> 
-  filter(prox_code == c("1", "2", "3")) |> 
-  mutate(prox_code = as.factor(prox_code),
-         prox_code = fct_collapse(prox_code,
-                                  "Detached" = "1",
-                                  "Semi-attached" = "2",
-                                  "Attached" = "3")) |> 
-  group_by(prox_code) |> 
+#part 2
+brooklyn_sales_res |>
+  filter(prox_code == c("1", "2", "3")) |>
+  mutate(
+    prox_code = as.factor(prox_code),
+    prox_code = fct_collapse(
+      prox_code,
+      "Detached" = "1",
+      "Semi-attached" = "2",
+      "Attached" = "3"
+    )
+  ) |>
+  group_by(prox_code) |>
   ggplot() +
-  geom_bar(aes(x = prox_code))
+  geom_bar(aes(x = prox_code, fill = prox_code)) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(
+      angle = 0,
+      vjust = 0.5,
+      margin = margin(
+        t = 0,
+        r = 10,
+        b = 0,
+        l = 0
+      )
+    ),
+    legend.position = "none"
+  ) +
+  labs(y = "Count",
+       x = "Proximity Code") +
+  scale_y_continuous(label = scales::comma_format())
   
-# FIGURE 3: ZIP Code Analysis? Check if possible if they have same size or not (sq ft) and if there's a general thing.
-# Price per sq ft for each zip code?
+# FIGURE 3: 
 #WHAT NEIGHBORHOODS ARE THE MOST EXPENSIVE? ARE THEY THE SAME AS THE MOST POPULAR ONES?
-
-#might be a better way to visualize figure 4 in section 1 to be honest.
-
 brooklyn_sales_res |> 
   group_by(neighborhood) |> 
   summarise(
@@ -561,8 +608,6 @@ brooklyn_sales_res |>
   geom_point() + 
   geom_jitter()
 
-#even weirder way to modify it, do it by average?
-#this will be the 2nd part of the figure, I guess.
 brooklyn_sales_res |> 
   group_by(neighborhood) |> 
   summarise(
@@ -572,8 +617,19 @@ brooklyn_sales_res |>
   ) |> 
   filter(avg_sale_n > 0,
          sq_avg < 10000) |> 
-  ggplot(aes(x = count, y = sq_avg, alpha = avg_sale_n)) +
-  geom_point() + 
-  geom_jitter()
+  ggplot(aes(x = count, y = sq_avg)) +
+  geom_point(aes(color = avg_sale_n)) + 
+  geom_jitter(aes(color = avg_sale_n)) +
+  scale_x_continuous(label = scales::comma_format()) +
+  scale_y_continuous(label = scales::comma_format()) +
+  scale_color_continuous(
+    name = "Average Sale Price",
+    labels=c('$200,000','$400,000', '$600,000', '$800,000', '$1,000,000')) +
+  theme_minimal() +
+  labs(
+    x = "Count",
+    y = "Average\nSquare\nFeet"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 

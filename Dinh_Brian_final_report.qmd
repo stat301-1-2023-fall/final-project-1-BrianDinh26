@@ -71,7 +71,7 @@ Before exploring this question, I wanted to check to see the different types of 
 
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 #| label: fig-tax
 #| fig-cap: "Distributions of Building Sold in Brooklyn by Tax Classes"
 #| fig-subcap:
@@ -146,7 +146,7 @@ After separating the dataset, I wanted to look at how the number of sales for bu
 ```{r}
 #| label: fig-year-count
 #| echo: false
-#| eval: false
+#| eval: true
 #| fig-cap: Distribution of Brooklyn Building Sales by Year
 #| fig-subcap:
 #|   - "Number of Residential Building Sales in Brooklyn by Year"
@@ -197,7 +197,7 @@ In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Br
 ```{r}
 #| label: fig-sale-line
 #| echo: false
-#| eval: false
+#| eval: true
 #| fig-cap: Average Building Sale Prices by Year in Brooklyn
 #| fig-subcap:
 #|   - "Average Residential Building Sale Price by Year, Brooklyn"
@@ -245,7 +245,7 @@ Looking at @fig-sale-line-1 and @fig-sale-line-2, it appears that the average sa
 ```{r}
 #| label: fig-price-cuts
 #| echo: false
-#| eval: false
+#| eval: true
 #| fig-cap: "Distribution of Count of Residential Buildings Sold in Brooklyn by Price"
 #| fig-subcap:
 #|   - "2003-2006"
@@ -311,10 +311,9 @@ brooklyn_sales_res |>
         # stick with 4 cause fits html well.
         axis.title.y = element_text(angle = 0, vjust = 0.5)) +
   labs(
-    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
-    subtitle = "2003 to 2006",
     x = "Sale Price Ranges",
-    y = "Count"
+    y = "Count",
+    caption = "Source: NYC Department of Finance"
   )
 
 #2007-2010
@@ -376,10 +375,9 @@ brooklyn_sales_res |>
         # stick with 4 cause fits html well.
         axis.title.y = element_text(angle = 0, vjust = 0.5)) +
   labs(
-    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
-    subtitle = "test to test",
     x = "Sale Price Ranges",
-    y = "Count"
+    y = "Count",
+    caption = "Source: NYC Department of Finance"
   )
 
 #2011-2017
@@ -437,13 +435,11 @@ brooklyn_sales_res |>
   coord_cartesian(ylim = c(0, 2000)) +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 4),
-        # stick with 4 cause fits html well.
         axis.title.y = element_text(angle = 0, vjust = 0.5)) +
   labs(
-    title = "Distribution of Count of Residential Buildings Sold in Brooklyn by Price",
-    subtitle = "2011 to 2017",
     x = "Sale Price Ranges",
-    y = "Count"
+    y = "Count",
+    caption = "Source: NYC Department of Finance"
   )
 ```
 
@@ -469,7 +465,8 @@ brooklyn_sales_res |>
   theme_minimal() +
   coord_cartesian(ylim = c(0, 4000000), xlim = c(0, 10000)) +
   labs(x = "Gross Square Ft",
-       y = "Sale\nPrice") +
+       y = "Sale\nPrice",
+       caption = "Source: NYC Department of Finance") +
   theme(axis.title.y = element_text(
     angle = 0,
     vjust = 0.5,
@@ -495,41 +492,77 @@ Another variable I wanted to look at was `prox_code`, which identifies the proxi
 #| eval: true
 #| fig-cap: "Distribution of Residential Buildings by Proximity Code"
 #| fig-subcap:
-#|   - "Yearly Average Residential Building Prices in Brooklyn, Split by Proximity Codes"
-#|   - "Count of Residential Buildings Sold in Brooklyn from 2003-2017"
+#|   - "Yearly Average Residential Building Prices in Brooklyn, Divided by Proximity Codes"
+#|   - "Count of Residential Buildings Sold in Brooklyn from 2003-2017, Divided by Proximity Codes"
 #| layout-ncol: 1
 
 #first figure
-brooklyn_sales_res |> 
-  filter(prox_code == c("1", "2", "3")) |> 
-  mutate(prox_code = as.factor(prox_code),
-         prox_code = fct_collapse(prox_code,
-                                 "Detached" = "1",
-                                 "Semi-attached" = "2",
-                                 "Attached" = "3")) |> 
-  group_by(year_of_sale, prox_code) |> 
-  mutate(yearly_avg_price = mean(sale_price)) |> 
+brooklyn_sales_res |>
+  filter(prox_code == c("1", "2", "3")) |>
+  mutate(
+    prox_code = as.factor(prox_code),
+    prox_code = fct_collapse(
+      prox_code,
+      "Detached" = "1",
+      "Semi-attached" = "2",
+      "Attached" = "3"
+    )
+  ) |>
+  group_by(year_of_sale, prox_code) |>
+  mutate(yearly_avg_price = mean(sale_price)) |>
   ggplot(aes(x = year_of_sale, y = yearly_avg_price, color = prox_code)) +
   geom_line() +
   theme_minimal() +
-  labs(
-    x = "Year",
-    y = "Average\nSale\nPrice"
-  ) +
-  theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-  scale_y_continuous(label = scales::dollar_format())
+  labs(x = "Year",
+       y = "Average\nSale\nPrice",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(
+    angle = 0,
+    vjust = 0.5,
+    margin = margin(
+      t = 0,
+      r = 10,
+      b = 0,
+      l = 0
+    )
+  )) +
+  scale_y_continuous(label = scales::dollar_format()) +
+  scale_color_discrete(name = "Proximity Code")
+
 
 #second figure
-brooklyn_sales_res |> 
-  filter(prox_code == c("1", "2", "3")) |> 
-  mutate(prox_code = as.factor(prox_code),
-         prox_code = fct_collapse(prox_code,
-                                  "Detached" = "1",
-                                  "Semi-attached" = "2",
-                                  "Attached" = "3")) |> 
-  group_by(prox_code) |> 
+brooklyn_sales_res |>
+  filter(prox_code == c("1", "2", "3")) |>
+  mutate(
+    prox_code = as.factor(prox_code),
+    prox_code = fct_collapse(
+      prox_code,
+      "Detached" = "1",
+      "Semi-attached" = "2",
+      "Attached" = "3"
+    )
+  ) |>
+  group_by(prox_code) |>
   ggplot() +
-  geom_bar(aes(x = prox_code))
+  geom_bar(aes(x = prox_code, fill = prox_code)) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(
+      angle = 0,
+      vjust = 0.5,
+      margin = margin(
+        t = 0,
+        r = 10,
+        b = 0,
+        l = 0
+      )
+    ),
+    legend.position = "none"
+  ) +
+  labs(y = "Count",
+       x = "Proximity Code",
+       caption = "Source: NYC Department of Finance") +
+  scale_y_continuous(label = scales::comma_format())
 ```
 
 @fig-prox-price-1 reveals that on average, detached and attached buildings were around the same price points from 2003 to 2017, while semi-attached buildings tend to be cheaper than other properties. However, in @fig-prox-price-2, semi-attached buildings are the 2nd most sold, with attached buildings being the highest and detached buildings being the least sold. This information may indicate that the cheapness of semi-attached properties could result in more transfers of properties or sellings.
@@ -540,37 +573,43 @@ One factor I thought would be a major aspect of determining building price was t
 #| label: fig-age-dist
 #| echo: false
 #| eval: true
-#| fig-cap: "Distribution of Residential Buildings by Age"
+#| fig-cap: "Distribution of Residential Buildings by Age Brackets"
 
 brooklyn_sales |> 
-  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
-                                             paste(c("1", "2"), 
-                                                   collapse = "|", "$", sep = ""), 
-                                             "residential")) |> 
+  mutate(tax_class_at_sale = str_replace_all(
+    tax_class_at_sale,
+    paste(c("1", "2"),
+          collapse = "|", "$", sep = ""),
+    "residential"
+  )) |>
   filter(tax_class_at_sale == c("residential"),
-         is.na(year_built) == FALSE) |> 
-  mutate(
-    building_age = year_of_sale - year_built
-  ) |> 
+         is.na(year_built) == FALSE) |>
+  mutate(building_age = year_of_sale - year_built) |>
   filter(sale_price < 4000000,
-         building_age < 120) |> 
-  mutate(building_age = cut(
-    building_age,
-    breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
-  filter(is.na(building_age) == FALSE) |> 
-  group_by(building_age) |> 
+         building_age < 250) |>
+  mutate(building_age = cut(building_age,
+                            breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |>
+  filter(is.na(building_age) == FALSE) |>
+  group_by(building_age) |>
   ggplot(aes(y = building_age)) +
   theme_minimal() +
-  scale_y_discrete(labels = c("0 to 15", "15 to 30", "30 to 45", "45 to 60",
-                              "60 to 75", "75 to 90", "90 to 105", "105 to 120")) +
-  scale_x_continuous(labels = scales::comma) +
-  geom_bar() +
-  labs(
-    caption = "Source: NYC Department of Finance",
-    title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
-    y = "Building\nAge\n(in years)",
-    x = "Count"
+  scale_y_discrete(
+    labels = c(
+      "0 to 15",
+      "15 to 30",
+      "30 to 45",
+      "45 to 60",
+      "60 to 75",
+      "75 to 90",
+      "90 to 105",
+      "105 to 120"
+    )
   ) +
+  scale_x_continuous(labels = scales::comma) +
+  geom_bar(fill = "#d3e3e1", color = "black") +
+  labs(caption = "Source: NYC Department of Finance",
+       y = "Building\nAge\n(in years)",
+       x = "Count") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
 
@@ -580,20 +619,28 @@ Based on @fig-age-dist, the residential buildings that were sold in Brooklyn the
 #| label: fig-age-price
 #| echo: false
 #| eval: true
-#| fig-cap: "Average Residential Building Price by Building Age"
+#| fig-cap: "Average Residential Building Price in Brooklyn by Building Age"
 
 brooklyn_sales_res |> 
   mutate(building_age = year_of_sale - year_built) |> 
-  filter(sale_price < 4000000, #outlier removal
-         sale_price > 100, #outlier removal
+  filter(sale_price < 4000000,
+         sale_price > 100,
          building_age < 120,
-         building_age > 0) |>  #outlier removal
+         building_age > 0) |> 
   group_by(building_age) |> 
   mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
   ggplot(aes(x = building_age, y = age_avg_price)) +
   geom_point() +
   geom_jitter() +
-  geom_smooth(method = lm)
+  geom_smooth(method = lm) +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    x = "Building Age",
+    y = "Average Sale\nPrice",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
 Analyzing @fig-age-price, it appears that the newer buildings (0 to 15 years old) are around the same price as the highly popular 75 to 90 and 90 to 105 range yet are not as sold as often. There also is an interesting dip in average building prices for the 25 to 75 year old building range, and a somewhat exponential growth in building price after 105 years, which could be due to limited samples in buildings that old.
 
@@ -604,7 +651,7 @@ Another aspect that I wanted to analyze in the data is what neighborhoods are th
 ![Neighborhood Map of Brooklyn](images/brooklyn_neighborhoods.png)
 
 
-First off, I want to look at the neighborhoods with the highest number of residential buildings sold from 2003 to 2017, including the mean price of these properties.
+First off, I wanted to look at the neighborhoods with the highest number of residential buildings sold from 2003 to 2017, including the mean price of these properties.
 ```{r}
 #| label: fig-table
 #| echo: false
@@ -638,6 +685,7 @@ I also wanted to see if the average square feet of the buildings in these neighb
 #| label: fig-sqft-sale
 #| echo: false
 #| eval: true
+#| fig-cap: "Brooklyn Neighborhood Building Sales by Average Square Feet and Average Sale Price"
 
 brooklyn_sales_res |> 
   group_by(neighborhood) |> 
@@ -648,9 +696,21 @@ brooklyn_sales_res |>
   ) |> 
   filter(avg_sale_n > 0,
          sq_avg < 10000) |> 
-  ggplot(aes(x = count, y = sq_avg, alpha = avg_sale_n)) +
-  geom_point() + 
-  geom_jitter()
+  ggplot(aes(x = count, y = sq_avg)) +
+  geom_point(aes(color = avg_sale_n)) + 
+  geom_jitter(aes(color = avg_sale_n)) +
+  scale_x_continuous(label = scales::comma_format()) +
+  scale_y_continuous(label = scales::comma_format()) +
+  scale_color_continuous(
+    name = "Average Sale Price",
+    labels=c('$200,000','$400,000', '$600,000', '$800,000', '$1,000,000')) +
+  theme_minimal() +
+  labs(
+    x = "Count",
+    y = "Average\nSquare\nFeet",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
 One interesting observation is that the average square feet of many expensive (and less sold) neighborhoods is much lower than the average square feet of the neighborhoods that are sold more often. The more sold neighborhoods converge around the 1500 to 2500 average square feet range, which may indicate that having more space to live in can lead to more sales.
 
@@ -666,7 +726,6 @@ Next, I wanted to see if the most popular neighborhoods changed depending on the
 #|   - "2011-2017"
 #| layout-ncol: 1
 
-
 #2003-2006
 brooklyn_sales_res |> 
   filter(year_of_sale == c(2003, 2004, 2005, 2006)) |> 
@@ -674,10 +733,14 @@ brooklyn_sales_res |>
   mutate(n = n()) |> 
   filter(n > 650) |> 
   ggplot(aes(y = fct_reorder(neighborhood, n))) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1") +
+  theme_minimal() +
   labs(
-    title = "2003-2006 sales"
-  )
+    y = "Neighborhood",
+    x = "Count",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 #2007-2010
 brooklyn_sales_res |> 
@@ -686,10 +749,14 @@ brooklyn_sales_res |>
   mutate(n = n()) |> 
   filter(n > 350) |> 
   ggplot(aes(y = fct_reorder(neighborhood, n))) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1") +
+  theme_minimal() +
   labs(
-    title = "2007-2010 sales"
-  )
+    y = "Neighborhood",
+    x = "Count",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 #2011-2017
 brooklyn_sales_res |> 
@@ -698,12 +765,18 @@ brooklyn_sales_res |>
   mutate(n = n()) |> 
   filter(n > 385) |> 
   ggplot(aes(y = fct_reorder(neighborhood, n))) +
-  geom_bar() +
+  geom_bar(fill = "#d3e3e1") +
+  theme_minimal() +
   labs(
-    title = "2011-2017 sales"
-  )
+    y = "Neighborhood",
+    x = "Count",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+
+
 ```
-**THESE GRAPHS ARE UGLY FIX THEM AFTER**
 
 Looking at @fig-neighbor-bar-1, @fig-neighbor-bar-2, and @fig-neighbor-bar-3, the neighborhoods of Bedford Stuyvesant, East New York, Bay Ridge, and Borough Park are the most sold residential properties in Brooklyn, which makes sense as these properties are generally cheaper than the overall average prices for residential housing in Brooklyn. However, comparing @fig-neighbor-bar-1 and @fig-table, the neighborhood of Crown Heights appears to be an outlier, as it is relatively higher in price ($519,171.17) yet also getting increasingly popular.
 
