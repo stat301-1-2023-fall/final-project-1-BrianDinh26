@@ -33,6 +33,7 @@
 #large dataset
 data/raw/brooklyn_sales_map.csv
 data/brooklyn_sales_clean.csv
+data/progress_memos/data/brooklyn_sales_map.csv
 
 # ignore files (likely datasets or graphics) if too large (> 100 MB)
 # specify pathway to dataset data/project_dataset.csv
