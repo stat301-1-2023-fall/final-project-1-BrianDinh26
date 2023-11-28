@@ -1,0 +1,288 @@
+---
+title: "Progress Memo 2 for Brooklyn Housing Dataset (2003-2017)"
+subtitle: |
+  | Final Project 
+  | Data Science 1 with R (STAT 301-1)
+author: "Brian Dinh"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    
+execute:
+  echo: true
+  warning: false
+
+from: markdown+emoji 
+---
+```{r}
+#| echo: false
+
+#I do not want scientific notation for my graphs.
+options(scipen = 999)
+
+#load packages
+library(tidyverse)
+library(naniar)
+library(janitor)
+library(visdat)
+library(ggthemes)
+#test
+#cleaned dataset
+brooklyn_sales <- read_csv("data/brooklyn_sales_map.csv", na = c("NA", "")) |> 
+  clean_names() |> 
+  select(where(~mean(is.na(.)) < 0.5)) |> 
+  subset(
+    select = -c(
+      borough,
+      mappluto_f,
+      version,
+      pluto_map_id,
+      x_coord,
+      y_coord,
+      condo_no,
+      bbl,
+      boro_code,
+      owner_name
+    )
+  ) |> 
+  mutate(
+    land_sqft = as.numeric(land_sqft),
+    zip_code = as.factor(zip_code),
+    school_dist = as.factor(school_dist),
+    tax_class_at_sale = as.factor(tax_class_at_sale),
+    sale_date = as.Date(sale_date)
+  )
+```
+
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git](https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git)
+
+:::
+
+# Introduction
+Since the previous memo, I have worked on cleaning the data and starting on exploratory data analysis. To repeat, the dataset I am using is a dataset containing information on Brooklyn Home Sales from 2003 to 2017. The dataset is from Kaggle that was sourced from the New York City Department of Finance. [Here is a link to the dataset.](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data) Additionally, [here is a glossary for the dataset](https://www.nyc.gov/site/finance/taxes/glossary-property-sales.page).
+
+
+# Data Cleaning
+For data cleaning, the code of which will not be shown in this document, I cleaned the column names using the `janitor::cleannames`, filtered out all the columns with over 50% of the values being NA, manually removed columns that I found to be irrelevant (like borough number and coordinate data), and manually converted variables to a more appropriate type, like converting ZIP code data into factor data. If you would like to see the code used for data cleaning, please refer to the `data_cleaning_and_exploration.R` file in the GitHub linked in the introduction, which contains data cleaning code in addition to some exploratory data analysis testing.
+
+# Exploratory Data Analysis
+The initial questions I had in mind in terms of this dataset were in regards to what affected the number of buildings being sold in Brooklyn over time and what variables could suggest a higher sales price for buildings in Brooklyn.
+
+To start off, I wanted to look at the number of buildings sold in Brooklyn each year.
+```{r}
+#| echo: false
+#| eval: true
+brooklyn_sales |> 
+  group_by(year_of_sale) |> 
+  ggplot() +
+  theme_minimal() +
+  geom_bar(aes(y = year_of_sale), fill ="#d3e3e1", color = "black") +
+  scale_y_reverse(breaks = c(2003, 2004, 2005, 2006,
+                             2007, 2008, 2009, 2010,
+                             2011, 2012, 2013, 2014,
+                             2015, 2016, 2017)) +
+  scale_x_continuous(breaks = c(5000, 10000, 15000, 20000, 25000, 30000, 35000)) +
+  labs(title = "Number of Building Sales in Brooklyn by Year",
+       subtitle = "From 2003 to 2017",
+       x = "Number of Sales",
+       y = "Year of Sale",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+It seems that the highest number of sales happened in the cluster from 2003 to 2006, while there seemed to be a significant dip in sales from 2007 to 2010, which was also the same time period as the recession within the United States. From 2011 to 2017, the number of sales increased, but not to the levels of that in 2003 to 2006. Based on this graph, I had the question of whether these three time periods, which I will label as **(pre-recession (2003-2006), recession (2007-2010), and post-recession (2011-2017))**, had any significant variations in the distribution of variables such as building class, total square feet, sale price, and more. Additionally, I wanted to check how the average prices of building sales varied from year to year.
+
+```{r}
+#| echo: false
+#| eval: true
+brooklyn_sales |> 
+  group_by(year_of_sale) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price)) +
+  theme_minimal() +
+  geom_point() + 
+  geom_line() +
+  scale_x_continuous(breaks = c(2003, 2005, 2007,
+                                2009, 2011, 2013,
+                                2015, 2017)) + 
+  scale_y_continuous(breaks = c(200000, 400000, 600000, 800000),
+                     labels = c("$200,000", "$400,000", "$600,000", "$800,000")) +
+  labs(y = "Price ($)",
+       x = "Year",
+       title = "Average Building Sale Price in Brooklyn by Year",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+Based on the line plot above, it seems that although the years 2003 to 2006 had a higher number of building sales, the average prices of these buildings were only around the $300,000 to $500,000 range, in comparison to the extremely increasing prices from 2011 to 2017 with relatively lower building sales. It was also interesting to note the dip in the 2007 to 2010 range and stimulated the question about whether these price changes had to do with the increasing quality (more square feet) of these buildings or if they were attributable to factors outside of this dataset that could affect cost of living.
+
+First off, I wanted to check what types of buildings were being sold, as the state of New York classifies each building into 4 categories:
+
+* **(Class 1)**: Includes most residential property of up to three units (such as one-, two-, and three-family homes and small stores or offices with one or two attached apartments), vacant land that is zoned for residential use, and most condominiums that are not more than three stories.
+* **(Class 2)**: Includes all other property that is primarily residential, such as cooperatives and condominiums.
+* **(Class 3)**: Includes property with equipment owned by a gas, telephone or electric company.
+* **(Class 4)**: Includes all other properties not included in class 1,2, and 3, such as offices, factories, warehouses, garage buildings, etc.
+
+```{r}
+#| echo: false
+#| eval: true
+brooklyn_sales |> 
+  filter(is.na(tax_class_at_sale) == FALSE) |> 
+  group_by(tax_class_at_sale) |> 
+  mutate(n = n()) |>
+  ggplot(aes(y = fct_reorder(tax_class_at_sale, n), fill = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_bar() +
+  labs(
+    title = "2003-2017 Tax Classes of Buildings Sold in Brooklyn",
+    y = "Tax Class\nAt Sale",
+    x = "Count",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
+        legend.position = "none")
+  
+```
+From this graph, it appears that there are not enough buildings of tax class 3 to be relevant to factor into our analysis. I will group together tax class 1 and 2 together as they are primarily residential buildings, and separate tax class 4 as those buildings are mainly corporate or for other functions, which may affect the residential data significantly. For example, let's look at how building sale prices differ by tax class.
+
+```{r}
+#| echo: false
+brooklyn_sales |> 
+  ggplot(aes(x = sale_date, y = sale_price, color = tax_class_at_sale)) +
+  theme_minimal() +
+  geom_line(key_glyph = "timeseries") +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(x = "Sale Date",
+       y = "Sale Price",
+       title = "Distribution of Brooklyn Building Sales Over Time by Tax Class",
+       caption = "Source: NYC Department of Finance",
+       color = "Tax Class at Sale") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+Looking at the graph above, it is clear that non-residential buildings (tax class 4) skew the prices upwards, thus it makes sense to separate the buildings into primarily residential (tax class 1 and 2) and non-residential (tax class 4). Although we can see some price spikes from tax class 3, these types of buildings are hyper-specific and not relevant to my own questions of housing prices for the general public.
+
+Next up in my analysis, I want to circle back to my earlier question about "quality" of home, or essentially, is what people paying for homes actually changing how much space (square feet) they get or not? I used box plots to compare the distribution of square feet for residential buildings sold for the three defined periods of pre-recession, recession, and post-recession.
+```{r}
+#| echo: false
+#| eval: true
+#2003-2006
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2003-2006 distribution of square ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2007-2010
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2007-2010 distribution of square ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2011-2017
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2011-2017 distribution of square ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+```
+
+For all three time periods analyzed, the general distribution for each was from around 1800 square ft to 2700 square ft, with the median for all three time periods converging near 2000 square ft. This information signifies that despite residential building prices rising immensely over time in comparison to the 2003-2006 period, the general area in square feet of these buildings still remained the same, which may suggest that the rising cost of residential buildings could be a result of factors outside of the dataset, such as inflation, new ordinances, and more.
+
+Last off, for this progress memo at least, I wanted to analyze the distribution of residential building sales by age of the building, since my initial intution is that older buildings are sold more often due to reliability and cheapness in comparison to newer propreties. I calculated age by creating a new variable, `building_age` which subtracted the `year_built` from `year_sold`.
+```{r}
+#| echo: false
+#| eval: true
+
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |> 
+  mutate(
+    building_age = year_of_sale - year_built
+  ) |> 
+  filter(sale_price < 1000000,
+         building_age < 250) |> 
+  mutate(building_age = cut(
+    building_age,
+    breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
+  filter(is.na(building_age) == FALSE) |> 
+  group_by(building_age) |> 
+  ggplot(aes(y = building_age)) +
+  theme_minimal() +
+  geom_bar() +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
+    y = "Building\nAge\n(in years)",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+This graph does support my initial ideas about the bulk of residential buildings being sold typically being older in age, but I was still surprised by how the majority of these sold buildings are more than 75 years old. From here, I have questions about how much cheaper these older buildings are, or if they are relatively the same price as newer buildings, which will be further addressed in the final project.
+
+# Conclusions and next steps
+So far, I have explored parts of my initial questions in regards to how the number of building sales are affected over time and certain factors that may affect it, such as building age, tax class, and cost. I am satisfied with my current look at building age count distributions and outlier analysis, and for the final project itself, I plan on exploring more intensely what variables may significantly affect the cost of residential buildings, which includes if it is in a historical district, what school district or zip code it is in, and more. Although I like the visualizations I have so far, I want to add more multivariate analyses and also work with stacked barcharts when it comes to the categorical variables in my dataset. Another curiosity I want to explore if possible is looking at tax class 4 (non-residential) building sales and prices during and after the recession, because I have a hunch that many buildings were sold for cheap to cover losses. I also want to make my graphs look more visually appealing for the final project, as right now, they are quite bare.

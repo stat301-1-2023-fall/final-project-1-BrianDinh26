@@ -36,9 +36,7 @@ options(scipen = 999)
 
 #libraries
 library(tidyverse)
-library(naniar)
 library(janitor)
-library(visdat)
 library(ggthemes)
 
 #import dataset
@@ -54,7 +52,7 @@ brooklyn_sales_nonres <- brooklyn_sales |>
   The purpose of this report was to analyze sales and prices of buildings sold in Brooklyn from 2003 to 2017 in comparison to other building variables. The data is from the state of New York. Based on my exploratory data analysis, I found that 30 out of the 111 variables had large missingness and inconsistent data issues, so one must clean this dataset before working with it in the future.
 
 # Insights and Conclusions
-  I found that the average sale price of both residential and non-residential buildings (e.g. office spaces and restaurants) has increased significantly since 2003, outside of a large fall in price from 2007 to 2010, and yet the number of buildings sold in Brooklyn have gone down overall. The dip in the number of sales for residential buildings from 2011 to 2017 indicates that the higher price barrier of homes might deter more people from buying. 
+  I found that the average sale price of both residential and non-residential buildings (e.g. office spaces and warehouses) has increased significantly since 2003, outside of a large fall in price from 2007 to 2010, and yet the number of buildings sold in Brooklyn have gone down overall. The dip in the number of sales for residential buildings from 2011 to 2017 indicates that the higher price barrier of homes might deter more people from buying. 
 
 ```{r}
 #| label: fig-sale-line
