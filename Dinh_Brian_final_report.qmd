@@ -40,14 +40,6 @@ library(ggthemes)
 
 #import dataset
 brooklyn_sales <- read_csv("data/brooklyn_sales_clean.csv")
-
-#put these filterings in a SEPARATE CODE CHUNK LATER.
-brooklyn_sales_res <- brooklyn_sales |> 
-  filter(tax_class_at_sale == c("1", "2"))
-
-brooklyn_sales_nonres <- brooklyn_sales |> 
-  filter(tax_class_at_sale == c("3", "4"))
-
 ```
 
 # Introduction {#sec-introduction}
@@ -68,7 +60,7 @@ The cleaned dataset has 390,833 observations and 81 columns. There are 19 catego
 
 # Explorations
 
-## How many buildings are being sold in Brooklyn over time? How have these sales changed? Where are they being sold?
+## How many buildings are being sold in Brooklyn over time?
 
 Before exploring this question, I wanted to check to see the different types of buildings being sold in Brooklyn, because my initial hypothesis assumes that the building type can greatly affect certain data about the building. The variable of `tax_class_at_sale` categorizes the type of building sold into 4 categories according to the state of New York:
 
@@ -200,12 +192,12 @@ brooklyn_sales_nonres |>
                                 margin = margin(t = 0, r = 10, b = 0, l = 0))
   )
 ```
-In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Brooklyn tended to be the highest from 2003 to 2006, while there was a significant dip in sales from 2007 to 2010, which was stronger for residential buildings than it was for non-residential buildings. From to 2011 to 2017, there appears to have been a recovery in building sales. These three time periods are interesting to look at in terms of determining if the three time periods had the same trends or not. For example, one immediate question I had was if the decrease in sales was due to an increase or decrease in price in the building market. To analyze this, I made the following line plots.
+In both @fig-year-count-1 and @fig-year-count-2, the distribution of sales in Brooklyn tended to be the highest from 2003 to 2006, while there was a significant dip in sales from 2007 to 2010, which was stronger for residential buildings than it was for non-residential buildings. From to 2011 to 2017, there appears to have been a recovery in building sales. These three time periods are interesting to look at in terms of determining if the three time periods had the same trends or not. For example, one immediate question I had was if the decrease in sales was due to an increase or decrease in price in the building market. To analyze this, I made the following line plots, which analyze the average sale prices for buildings sold in Brooklyn, grouped by year.
 
 ```{r}
 #| label: fig-sale-line
 #| echo: false
-#| eval: false
+#| eval: true
 #| fig-cap: Average Building Sale Prices by Year in Brooklyn
 #| fig-subcap:
 #|   - "Average Residential Building Sale Price by Year, Brooklyn"
@@ -248,11 +240,12 @@ brooklyn_sales_nonres |>
        caption = "Source: NYC Department of Finance") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
-(add a more thorough explanation with a segue into next graph here later. tldr my hypothesis was wrong, less sales were in a time of cheaper buildings? why so? let's look year by year for the reasons why or at least explanationish)
+Looking at @fig-sale-line-1 and @fig-sale-line-2, it appears that the average sale price of buildings in Brooklyn actually decreased in the 2007-2010 range, which means that my hypothesis of lower sales meaning higher prices was incorrect. To investigate further, let us look at the price ranges of the buildings sold during the three time periods of 2003-2006, 2007-2010, and 2011-2017.
+
 ```{r}
 #| label: fig-price-cuts
 #| echo: false
-#| eval: false
+#| eval: true
 #| fig-cap: "Distribution of Count of Residential Buildings Sold in Brooklyn by Price"
 #| fig-subcap:
 #|   - "2003-2006"
@@ -453,7 +446,10 @@ brooklyn_sales_res |>
     y = "Count"
   )
 ```
-(general tldr is that for the 2007-2010 time period the most popular homes were still the 400kish range ones, it's just that there were significantly less homes sold at higher prices)
+
+In @fig-price-cuts-1, @fig-price-cuts-2, and @fice-price-cuts-3, the most common selling price in Brooklyn ranges from the $300k to $500k range, with this being the most prominent within @fig-price-cuts-1. However, with @fig-price-cuts-2, the number of homes sold at slightly above the $300k to $500k range significantly decreased, which could have caused the average price decreases for this time period. Within the 2011 to 2017 range, there has been a more subtle increase in properties being sold in the $700k to $1m range despite buildings in the $300k to $500k range being the most common, which could explain the immense increases in residential building prices over time.
+
+NOTE: CONSIDER ADDING NON-RESIDENTIAL ANALYSIS OF BUILDINGS SOLD WITH PRICE CUTS
 
 ## What neighborhoods are the most popular in Brooklyn?
 
@@ -467,7 +463,8 @@ brooklyn_sales_res |>
     Average = mean(sale_price),
     count = n()
   ) |> 
-  filter(Average > 0) |> 
+  filter(Average > 0,
+         count > 1) |> 
   arrange(desc(count)) |> 
   DT::datatable(
     colnames = c(
