@@ -31,6 +31,7 @@
 *.DS_Store
 
 #large dataset
+#test
 data/raw/brooklyn_sales_map.csv
 data/brooklyn_sales_clean.csv
 data/progress_memos/data/brooklyn_sales_map.csv
