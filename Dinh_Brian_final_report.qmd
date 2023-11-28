@@ -554,7 +554,7 @@ brooklyn_sales |>
     building_age = year_of_sale - year_built
   ) |> 
   filter(sale_price < 4000000,
-         building_age < 250) |> 
+         building_age < 120) |> 
   mutate(building_age = cut(
     building_age,
     breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
@@ -575,15 +575,20 @@ brooklyn_sales |>
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
 
-(basically lots of old buildings, but also growing number of new ones, weird peak of around 100 yr old buildings)
+Based on @fig-age-dist, the residential buildings that were sold in Brooklyn the most were heavily older than 75 years old, although there is still a large bulk of buildings being sold that are 0 to 15 years old. Next, I wanted to see if the age affected the price strongly or not.
 
-(let's look at price distribution!!!)
 ```{r}
+#| label: fig-age-price
+#| echo: false
+#| eval: true
+#| fig-cap: "Average Residential Building Price by Building Age"
+
 brooklyn_sales_res |> 
   mutate(building_age = year_of_sale - year_built) |> 
   filter(sale_price < 4000000, #outlier removal
          sale_price > 100, #outlier removal
-         building_age < 250) |>  #outlier removal
+         building_age < 120,
+         building_age > 0) |>  #outlier removal
   group_by(building_age) |> 
   mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
   ggplot(aes(x = building_age, y = age_avg_price)) +
@@ -591,7 +596,7 @@ brooklyn_sales_res |>
   geom_jitter() +
   geom_smooth(method = lm)
 ```
-older is more expensive???? but also dip in the mid-50s ish, maybe less refurbishments.
+Analyzing @fig-age-price, it appears that the newer buildings (0 to 15 years old) are around the same price as the highly popular 75 to 90 and 90 to 105 range yet are not as sold as often. There also is an interesting dip in average building prices for the 25 to 75 year old building range, and a somewhat exponential growth in building price after 105 years, which could be due to limited samples in buildings that old.
 
 ## What neighborhoods are the most popular in Brooklyn?
 

@@ -449,7 +449,8 @@ brooklyn_sales_res |>
   mutate(building_age = year_of_sale - year_built) |> 
   filter(sale_price < 4000000,
          sale_price > 100,
-         building_age < 250) |> 
+         building_age < 120,
+         building_age > 0) |> 
   group_by(building_age) |> 
   mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
   ggplot(aes(x = building_age, y = age_avg_price)) +
