@@ -535,6 +535,64 @@ brooklyn_sales_res |>
 
 @fig-prox-price-1 reveals that on average, detached and attached buildings were around the same price points from 2003 to 2017, while semi-attached buildings tend to be cheaper than other properties. However, in @fig-prox-price-2, semi-attached buildings are the 2nd most sold, with attached buildings being the highest and detached buildings being the least sold. This information may indicate that the cheapness of semi-attached properties could result in more transfers of properties or sellings.
 
+One factor I thought would be a major aspect of determining building price was the age of the building, since older buildings could be worse quality and therefore not as desired. First off, let's look at the distribution of buildings sold from 2003 to 2017 by age.
+
+```{r}
+#| label: fig-age-dist
+#| echo: false
+#| eval: true
+#| fig-cap: "Distribution of Residential Buildings by Age"
+
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |> 
+  mutate(
+    building_age = year_of_sale - year_built
+  ) |> 
+  filter(sale_price < 4000000,
+         building_age < 250) |> 
+  mutate(building_age = cut(
+    building_age,
+    breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |> 
+  filter(is.na(building_age) == FALSE) |> 
+  group_by(building_age) |> 
+  ggplot(aes(y = building_age)) +
+  theme_minimal() +
+  scale_y_discrete(labels = c("0 to 15", "15 to 30", "30 to 45", "45 to 60",
+                              "60 to 75", "75 to 90", "90 to 105", "105 to 120")) +
+  scale_x_continuous(labels = scales::comma) +
+  geom_bar() +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    title = "Count of Sold Brooklyn Residential Building Ages from 2003 to 2017",
+    y = "Building\nAge\n(in years)",
+    x = "Count"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+(basically lots of old buildings, but also growing number of new ones, weird peak of around 100 yr old buildings)
+
+(let's look at price distribution!!!)
+```{r}
+brooklyn_sales_res |> 
+  mutate(building_age = year_of_sale - year_built) |> 
+  filter(sale_price < 4000000, #outlier removal
+         sale_price > 100, #outlier removal
+         building_age < 250) |>  #outlier removal
+  group_by(building_age) |> 
+  mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
+  ggplot(aes(x = building_age, y = age_avg_price)) +
+  geom_point() +
+  geom_jitter() +
+  geom_smooth(method = lm)
+```
+older is more expensive???? but also dip in the mid-50s ish, maybe less refurbishments.
+
 ## What neighborhoods are the most popular in Brooklyn?
 
 Another aspect that I wanted to analyze in the data is what neighborhoods are the most popular in Brooklyn and where people tend to buy property. There are an estimated 77 neighborhoods in Brooklyn, although the dataset only gives 61. A rough map for these neighborhoods can be seen below:
@@ -570,6 +628,27 @@ brooklyn_sales_res |>
 ```
 
 From @fig-table, it appears that the most popular neighborhoods are not the most expensive ones, with the only neighborhood appearing in both the top 10 for count of residential buildings sold and average building price being Park Slope. Rather, these active neighborhoods tend to be lower in price in comparison to the overall averages as seen in @fig-sale-line-1. This information may indicate that these neighborhoods might be quite active in terms of moving ownership or at least might not be seen as places to stay "permanently."
+
+second visualization thing goes here, another way of imagining square ft
+```{r}
+#| label: fig-sqft-sale
+#| echo: false
+#| eval: true
+
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    avg_sale_n = mean(sale_price),
+    sq_avg = mean(land_sqft),
+    count = n()
+  ) |> 
+  filter(avg_sale_n > 0,
+         sq_avg < 10000) |> 
+  ggplot(aes(x = count, y = sq_avg, alpha = avg_sale_n)) +
+  geom_point() + 
+  geom_jitter()
+```
+
 
 Next, I wanted to see if the most popular neighborhoods changed depending on the time period.
 ```{r}
@@ -628,7 +707,7 @@ Looking at @fig-neighbor-bar-1, @fig-neighbor-bar-2, and @fig-neighbor-bar-3, th
 
 
 
-
+# Conclusions
 
 # References {#sec-references}
 -   "Annualized Sales Update." NYC Department of Finance, New York City, [www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page](www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page).
