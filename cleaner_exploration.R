@@ -633,3 +633,80 @@ brooklyn_sales_res |>
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 
+#box plot sq ft distribution
+#2003-2006
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2003-2006 distribution of square ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2007-2010
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot() +
+  labs(
+    title = "2007-2010 distribution of square ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2011-2017
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot(fill = "blue") +
+  labs(
+    title = "2011-2017 distribution of square ft in Brooklyn Residential Building Sales",
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+

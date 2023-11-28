@@ -52,7 +52,7 @@ For this exploratory data analysis, I was primarily motivated by my curiosity in
 
 For the original "Brooklyn Home Sales 2003 to 2017" dataset, there are 111 variables and 390,883 observations. There are 32 categorical variables, 71 numerical variables, 7 logical variables, and 1 date variable. 
 
-There are missingness issues for many columns associated with geographic mapping information, borough data (e.g. what borough the building is in), and some building information (like total units, building stories, etc.). Due to this missingness, I will not be able to construct a geographic visualization of the data using a dashboard package like Shiny and may be limited in my analysis of nonresidential buildings, as thorough building information could affect nonresidential prices. I do not believe the missing borough data will affect my analysis because all of the buildings sold are located in Brooklyn.
+There are missingness issues for many columns associated with geographic mapping information, borough data (e.g. what borough the building is in), and some building information (like total units, building stories, etc.). Due to this missingness, I may be limited in my analysis of nonresidential buildings, as thorough building information could affect nonresidential building prices significantly. I do not believe the missing borough data will affect my analysis because all of the buildings sold are located in Brooklyn.
 
 The dataset is not in the GitHub for this final project as it is too large (207.6 MB) to commit to the GitHub, so please refer to the hyperlink above in Introduction ([@sec-introduction]) for access to the original dataset and the cleaned dataset.
 
@@ -482,9 +482,173 @@ brooklyn_sales_res |>
 
 ```
 
-In @fig-ft-price, looking at the linear fitting line, it appears that there is a general positive relationship between price and square feet, meaning that the more square feet a property has, the more expensive it is, which was expected.
+In @fig-ft-price, looking at the linear fitting line, it appears that there is a general positive relationship between price and square feet, meaning that the more square feet a property has, the more expensive it is, which was expected. However, I also wanted to see if residential buildings, which as seen in @fig-sale-line-1 are getting more expensive over time on average, are also getting more square feet as a result.
 
-Another variable I wanted to look at was `prox_code`, which identifies the proximity of the property to another property. `prox_code` is split into three categories: detached, semi-attached, and attached.
+```{r}
+#| label: fig-box-sqft
+#| echo: false
+#| eval: true
+#| fig-cap: "Distribution of Square Feet in Brooklyn Residential Building Sales"
+#| fig-subcap:
+#|   - "2003-2006"
+#|   - "2007-2010"
+#|   - "2011-2017"
+#| layout-ncol: 1
+
+#2003-2006
+brooklyn_sales_res |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2003, 2004, 2005, 2006),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot(fill = "#d3e3e1") +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2007-2010
+brooklyn_sales_res |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2007, 2008, 2009, 2010),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot(fill = "#d3e3e1") +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+#2011-2017
+brooklyn_sales_res |> 
+  mutate(tax_class_at_sale = str_replace_all(tax_class_at_sale, 
+                                             paste(c("1", "2"), 
+                                                   collapse = "|", "$", sep = ""), 
+                                             "residential")) |> 
+  filter(year_of_sale == c(2011, 2012, 2013, 2014, 2015, 2016, 2017),
+         tax_class_at_sale == c("residential"),
+         land_sqft > 100) |> 
+  group_by(tax_class_at_sale) |> 
+  select(land_sqft) |> 
+  ggplot(aes(y = tax_class_at_sale, x = land_sqft)) +
+  theme_minimal() +
+  geom_boxplot(fill = "#d3e3e1") +
+  labs(
+    caption = "Source: NYC Department of Finance",
+    x = "Usable Square Feet"
+  ) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )
+
+```
+
+There appears to not be much of a difference between average square feet in all three time periods according to @fig-box-sqft-1, @fig-box-sqft-2, and @fig-box-sqft-3, which means that there must be some other variable that is causing the general increase in average prices of home sales in Brooklyn.
+
+One such variable I thought would be a major aspect of determining building price was the age of the building, since older buildings could be worse quality and therefore not as desired. First off, let's look at the distribution of buildings sold from 2003 to 2017 by age.
+
+```{r}
+#| label: fig-age-dist
+#| echo: false
+#| eval: true
+#| fig-cap: "Distribution of Residential Buildings by Age Brackets"
+
+brooklyn_sales |> 
+  mutate(tax_class_at_sale = str_replace_all(
+    tax_class_at_sale,
+    paste(c("1", "2"),
+          collapse = "|", "$", sep = ""),
+    "residential"
+  )) |>
+  filter(tax_class_at_sale == c("residential"),
+         is.na(year_built) == FALSE) |>
+  mutate(building_age = year_of_sale - year_built) |>
+  filter(sale_price < 4000000,
+         building_age < 250) |>
+  mutate(building_age = cut(building_age,
+                            breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |>
+  filter(is.na(building_age) == FALSE) |>
+  group_by(building_age) |>
+  ggplot(aes(y = building_age)) +
+  theme_minimal() +
+  scale_y_discrete(
+    labels = c(
+      "0 to 15",
+      "15 to 30",
+      "30 to 45",
+      "45 to 60",
+      "60 to 75",
+      "75 to 90",
+      "90 to 105",
+      "105 to 120"
+    )
+  ) +
+  scale_x_continuous(labels = scales::comma) +
+  geom_bar(fill = "#d3e3e1", color = "black") +
+  labs(caption = "Source: NYC Department of Finance",
+       y = "Building\nAge\n(in years)",
+       x = "Count") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+Based on @fig-age-dist, the residential buildings that were sold in Brooklyn the most were heavily older than 75 years old, although there is still a large bulk of buildings being sold that are 0 to 15 years old. Next, I wanted to see if the age affected the price strongly or not.
+
+```{r}
+#| label: fig-age-price
+#| echo: false
+#| eval: true
+#| fig-cap: "Average Residential Building Price in Brooklyn by Building Age"
+
+brooklyn_sales_res |> 
+  mutate(building_age = year_of_sale - year_built) |> 
+  filter(sale_price < 4000000,
+         sale_price > 100,
+         building_age < 120,
+         building_age > 0) |> 
+  group_by(building_age) |> 
+  mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
+  ggplot(aes(x = building_age, y = age_avg_price)) +
+  geom_point() +
+  geom_jitter() +
+  geom_smooth(method = lm) +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    x = "Building Age",
+    y = "Average Sale\nPrice",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+Analyzing @fig-age-price, it appears that the newer buildings (0 to 15 years old) are around the same price as the highly popular 75 to 90 and 90 to 105 range yet are not as sold as often. There also is an interesting dip in average building prices for the 25 to 75 year old building range, and a somewhat exponential growth in building price after 105 years, which could be due to limited samples in buildings that old.
+
+Another variable I wanted to look at was `prox_code`, which identifies the proximity of the property to another property. `prox_code` is split into three categories: detached, semi-attached, and attached. My initial assumption is that detached homes are the most popular due to having more privacy.
 
 ```{r}
 #| label: fig-prox-price
@@ -567,82 +731,6 @@ brooklyn_sales_res |>
 
 @fig-prox-price-1 reveals that on average, detached and attached buildings were around the same price points from 2003 to 2017, while semi-attached buildings tend to be cheaper than other properties. However, in @fig-prox-price-2, semi-attached buildings are the 2nd most sold, with attached buildings being the highest and detached buildings being the least sold. This information may indicate that the cheapness of semi-attached properties could result in more transfers of properties or sellings.
 
-One factor I thought would be a major aspect of determining building price was the age of the building, since older buildings could be worse quality and therefore not as desired. First off, let's look at the distribution of buildings sold from 2003 to 2017 by age.
-
-```{r}
-#| label: fig-age-dist
-#| echo: false
-#| eval: true
-#| fig-cap: "Distribution of Residential Buildings by Age Brackets"
-
-brooklyn_sales |> 
-  mutate(tax_class_at_sale = str_replace_all(
-    tax_class_at_sale,
-    paste(c("1", "2"),
-          collapse = "|", "$", sep = ""),
-    "residential"
-  )) |>
-  filter(tax_class_at_sale == c("residential"),
-         is.na(year_built) == FALSE) |>
-  mutate(building_age = year_of_sale - year_built) |>
-  filter(sale_price < 4000000,
-         building_age < 250) |>
-  mutate(building_age = cut(building_age,
-                            breaks = c(0, 15, 30, 45, 60, 75, 90, 105, 120))) |>
-  filter(is.na(building_age) == FALSE) |>
-  group_by(building_age) |>
-  ggplot(aes(y = building_age)) +
-  theme_minimal() +
-  scale_y_discrete(
-    labels = c(
-      "0 to 15",
-      "15 to 30",
-      "30 to 45",
-      "45 to 60",
-      "60 to 75",
-      "75 to 90",
-      "90 to 105",
-      "105 to 120"
-    )
-  ) +
-  scale_x_continuous(labels = scales::comma) +
-  geom_bar(fill = "#d3e3e1", color = "black") +
-  labs(caption = "Source: NYC Department of Finance",
-       y = "Building\nAge\n(in years)",
-       x = "Count") +
-  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
-```
-
-Based on @fig-age-dist, the residential buildings that were sold in Brooklyn the most were heavily older than 75 years old, although there is still a large bulk of buildings being sold that are 0 to 15 years old. Next, I wanted to see if the age affected the price strongly or not.
-
-```{r}
-#| label: fig-age-price
-#| echo: false
-#| eval: true
-#| fig-cap: "Average Residential Building Price in Brooklyn by Building Age"
-
-brooklyn_sales_res |> 
-  mutate(building_age = year_of_sale - year_built) |> 
-  filter(sale_price < 4000000,
-         sale_price > 100,
-         building_age < 120,
-         building_age > 0) |> 
-  group_by(building_age) |> 
-  mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
-  ggplot(aes(x = building_age, y = age_avg_price)) +
-  geom_point() +
-  geom_jitter() +
-  geom_smooth(method = lm) +
-  theme_minimal() +
-  scale_y_continuous(labels = scales::dollar_format()) +
-  labs(
-    x = "Building Age",
-    y = "Average Sale\nPrice",
-    caption = "Source: NYC Department of Finance"
-  ) +
-  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
-```
-Analyzing @fig-age-price, it appears that the newer buildings (0 to 15 years old) are around the same price as the highly popular 75 to 90 and 90 to 105 range yet are not as sold as often. There also is an interesting dip in average building prices for the 25 to 75 year old building range, and a somewhat exponential growth in building price after 105 years, which could be due to limited samples in buildings that old.
 
 ## What neighborhoods are the most popular in Brooklyn?
 
@@ -781,8 +869,16 @@ brooklyn_sales_res |>
 Looking at @fig-neighbor-bar-1, @fig-neighbor-bar-2, and @fig-neighbor-bar-3, the neighborhoods of Bedford Stuyvesant, East New York, Bay Ridge, and Borough Park are the most sold residential properties in Brooklyn, which makes sense as these properties are generally cheaper than the overall average prices for residential housing in Brooklyn. However, comparing @fig-neighbor-bar-1 and @fig-table, the neighborhood of Crown Heights appears to be an outlier, as it is relatively higher in price ($519,171.17) yet also getting increasingly popular.
 
 # Conclusions
+After going through this EDA, I learned from the first section that the majority of buildings sold in Brooklyn are primarily residential, with the number of sales decreasing from the time period of 2007 to 2010 relative to 2003 to 2006 and slightly recovering in the 2011 to 2017 range. Post 2007 to 2010, the average sale prices for both residential and non-residential buildings have increased significantly, with average prices for residential buildings in 2017 hovering around $700,000, in comparison to the average prices for residential buildings in 2007 ranging around $450,000. I was surprised about the decreases in sales and average prices of buildings from 2007 to 2010, since I expected that the cause of buildings being sold less would be because they were too expensive.
+
+In the second section of the EDA, I learned that despite gross square feet being partially positively correlated with sale price, there was not a significant increase in square feet of the residential buildings being sold from 2003 to 2006 in comparison to 2011 to 2017, even with the significant increases in price. I found this surprising because I expected that if one paid for a more expensive house, the house would be larger. Additionally, semi-attached residential buildings appear to be sold the cheapest on average, in comparison to attached and detached buildings. Last of all, I learned that the most expensive and most sold residential buildings were typically young (0 to 15 years old) or quite old (75 to 100 years old), while middle-aged buildings (40 to 60 years old) were relatively the cheapest. I was surprised by middle-aged buildings being cheaper than much older buildings, since I thought that there would be a consistent downward trend between price and building age.
+
+In the third and final section of my EDA, I learned that the neighborhoods that had the most residential properties sold had relatively lower average sale prices and higher square feet than more expensive and less sold residential properties. Additionally, the neighborhoods with the most residential properties sold tended to remain the same for all three time periods of 2003 to 2006, 2007 to 2010, and 2011 to 2017. Specifically, Bedford Stuyvesant, East New York, Borough Park, and Bay Ridge were in the top five properties quite often, which suggests that their price point and size could be quite attractive to buyers. I expected the lower priced neighborhoods to be the most sold as there would be less of a barrier to obtain them, although I was surprised by the lower amounts of average square feet for the expensive neighborhoods buildings, since I thought a more expensive neighborhood would have more space.
+
+Some additional points to look at for further exploration would be adjusting sale price with inflation to see if the values are actually starkly different or not, in addition to more analyzing economic data that could be compared with trends in housing, like unemployment or GDP. Additionally, having more up-to-date and complete geographic data of the addresses given in this dataset could allow for a more visual mapping of movement of sales over time with a Shiny app and slider. Lastly, adding data from 2018 to 2023 (as this dataset is being constantly added to) would serve as an interesting analysis and look into how building sales were affected by COVID-19, like how building sales were affected by the recession here from 2007 to 2010.
+
 
 # References {#sec-references}
 -   "Annualized Sales Update." NYC Department of Finance, New York City, [www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page](www.nyc.gov/site/finance/taxes/property-annualized-sales-update.page).
+-   Fitzgerald, Peter. "Brooklyn neighborhoods map." [https://commons.wikimedia.org/w/index.php?curid=7334362](https://commons.wikimedia.org/w/index.php?curid=7334362)
 -   Wu, Tommy. "Brooklyn Home Sales, 2003 to 2017." Kaggle, 15 Feb. 2018, [www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data](www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data).
-
