@@ -1,7 +1,7 @@
 ---
-title: "Final Report on Brooklyn Housing Dataset (2003-2017)"
+title: "Final Report on Analysis of Brooklyn Building Sales from 2003 to 2017"
 subtitle: |
-  | Class: Data Science 1 with R (STAT 301-1)
+  | Class: STAT 301-1, Fall 2023, Northwestern University
 author: "Brian Dinh"
 date: today
 fig-cap-location: top
@@ -40,13 +40,14 @@ library(ggthemes)
 
 #import dataset
 brooklyn_sales <- read_csv("data/brooklyn_sales_clean.csv")
+test <- read_csv("data/raw/brooklyn_sales_map.csv")
 ```
 
 # Introduction {#sec-introduction}
 
 For this report, I explored a dataset labelled "[Brooklyn Home Sales 2003 to 2017](https://www.kaggle.com/datasets/tianhwu/brooklynhomes2003to2017/data)," which describes information in regards to all buildings, residential and nonresidential, sold in the New York borough of Brooklyn. The data comes from the government of the state of New York, and links to the data can be found under References ([@sec-references]). Additionally, the cleaned dataset could not be uploaded to GitHub for the same reason, [so I have added a Google Drive link to it here](https://drive.google.com/drive/folders/1_OyRKj4xWoZ5CgJ5v0GhLubceh9yT5wW?usp=sharing).
 
-For this exploratory data analysis, I was primarily motivated by my curiosity in what could be the main motivators for selling more buildings in the Brooklyn market, especially since buildings in this area tend to be more expensive than the rest of the United States due to its urbanity and access to New York City as a whole. Additionally, I wished to look at what factors could have affected housing price increases in the area. Last of all, I wanted to look at what areas in Brooklyn are the most desired based on the popularity in sales in this dataset and what neighborhoods have become less popular.
+For this exploratory data analysis, I was primarily motivated by my curiosity in what could be the main motivators for selling more buildings in the Brooklyn market, especially since buildings in this area tend to be more expensive than the rest of the United States due to its urbanity and access to New York City as a whole. Additionally, I wished to look at what factors could have affected housing price increases in the area. Last of all, I wanted to look at what areas in Brooklyn are the most desired based on the popularity in sales.
 
 # Data Overview and Quality
 
@@ -62,7 +63,7 @@ The cleaned dataset has 390,833 observations and 81 columns. There are 19 catego
 
 ## How many buildings are being sold in Brooklyn over time?
 
-Before exploring this question, I wanted to check to see the different types of buildings being sold in Brooklyn, because my initial hypothesis assumes that the building type can greatly affect certain data about the building. The variable of `tax_class_at_sale` categorizes the type of building sold into 4 categories according to the state of New York:
+Before exploring this question, I wanted to check to see the different types of buildings being sold in Brooklyn, because my initial hypothesis assumes that the building type can greatly affect certain data about the building. The tax class at sale categorizes the type of building sold into 4 categories according to the state of New York:
 
 * **(Class 1)**: Includes most residential property of up to three units (such as one-, two-, and three-family homes and small stores or offices with one or two attached apartments), vacant land that is zoned for residential use, and most condominiums that are not more than three stories.
 * **(Class 2)**: Includes all other property that is primarily residential, such as cooperatives and condominiums.
@@ -240,7 +241,7 @@ brooklyn_sales_nonres |>
        caption = "Source: NYC Department of Finance") +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
-Looking at @fig-sale-line-1 and @fig-sale-line-2, it appears that the average sale price of buildings in Brooklyn actually decreased in the 2007-2010 range, which means that my hypothesis of lower sales meaning higher prices was incorrect. To investigate further, let us look at the price ranges of the buildings sold during the three time periods of 2003-2006, 2007-2010, and 2011-2017.
+Looking at @fig-sale-line-1 and @fig-sale-line-2, it appears that the average sale price of buildings in Brooklyn actually decreased in the 2007-2010 range, which means that my hypothesis of lower sales meaning higher prices was incorrect. This difference could be because of the U.S. recession that was occurirng in the time period. To investigate further, let us look at the price ranges of the buildings sold during the three time periods of 2003-2006, 2007-2010, and 2011-2017.
 
 ```{r}
 #| label: fig-price-cuts
@@ -648,7 +649,7 @@ brooklyn_sales_res |>
 ```
 Analyzing @fig-age-price, it appears that the newer buildings (0 to 15 years old) are around the same price as the highly popular 75 to 90 and 90 to 105 range yet are not as sold as often. There also is an interesting dip in average building prices for the 25 to 75 year old building range, and a somewhat exponential growth in building price after 105 years, which could be due to limited samples in buildings that old.
 
-Another variable I wanted to look at was `prox_code`, which identifies the proximity of the property to another property. `prox_code` is split into three categories: detached, semi-attached, and attached. My initial assumption is that detached homes are the most popular due to having more privacy.
+Another variable I wanted to look at was the proximity code, which identifies the proximity of the property to another property. `prox_code` is split into three categories: detached, semi-attached, and attached. My initial assumption is that detached homes are the most popular due to having more privacy.
 
 ```{r}
 #| label: fig-prox-price

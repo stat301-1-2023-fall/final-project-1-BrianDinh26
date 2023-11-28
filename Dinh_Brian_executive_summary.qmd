@@ -1,10 +1,11 @@
 ---
-title: "Executive Summary for Brooklyn Housing Dataset (2003-2017)"
+title: "Executive Summary of Analysis on Brooklyn Building Sales from 2003 to 2017"
 subtitle: |
-  | Final Project 
-  | Data Science 1 with R (STAT 301-1)
+  | Class: STAT 301-1, Fall 2023, Northwestern University
 author: "Brian Dinh"
 date: today
+
+fig-cap-location: top
 
 format:
   html:
@@ -17,3 +18,180 @@ execute:
 
 from: markdown+emoji 
 ---
+
+::: {.callout-tip icon="false"}
+## Github Repo Link
+
+<https://github.com/stat301-1-2023-fall/final-project-1-BrianDinh26.git>
+:::
+
+
+```{r}
+#| echo: false
+#| label: import
+#import dataset and libraries at top of document
+
+#I do not want scientific notation for my graphs.
+options(scipen = 999)
+
+#libraries
+library(tidyverse)
+library(naniar)
+library(janitor)
+library(visdat)
+library(ggthemes)
+
+#import dataset
+brooklyn_sales <- read_csv("data/brooklyn_sales_clean.csv")
+
+brooklyn_sales_res <- brooklyn_sales |> 
+  filter(tax_class_at_sale == c("1", "2"))
+
+brooklyn_sales_nonres <- brooklyn_sales |> 
+  filter(tax_class_at_sale == c("3", "4"))
+```
+# Purpose  
+  The purpose of this report was to analyze sales and prices of buildings sold in Brooklyn from 2003 to 2017 in comparison to other building variables. The data is from the state of New York. Based on my exploratory data analysis, I found that 30 out of the 111 variables had large missingness and inconsistent data issues, so one must clean this dataset before working with it in the future.
+
+# Insights and Conclusions
+  I found that the average sale price of both residential and non-residential buildings (e.g. office spaces and restaurants) has increased significantly since 2003, outside of a large fall in price from 2007 to 2010, and yet the number of buildings sold in Brooklyn have gone down overall. The dip in the number of sales for residential buildings from 2011 to 2017 indicates that the higher price barrier of homes might deter more people from buying. 
+
+```{r}
+#| label: fig-sale-line
+#| echo: false
+#| eval: true
+#| fig-cap: Average Building Sale Prices by Year in Brooklyn
+#| fig-subcap:
+#|   - "Average Residential Building Sale Price by Year, Brooklyn"
+#|   - "Average Non-Residential Building Sale Price by Year, Brooklyn"
+#| layout-ncol: 2
+
+# GRAPH OF AVG SALE PRICE OVER TIME FOR RESIDENTIAL ONLY
+brooklyn_sales_res |> 
+  group_by(year_of_sale) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price)) +
+  theme_minimal() + 
+  geom_line(color ="#d3e3e1", linewidth = 2) +
+  geom_point(color ="black", size = 2) +
+  scale_x_continuous(breaks = c(2003, 2005, 2007,
+                                2009, 2011, 2013,
+                                2015, 2017)) + 
+  scale_y_continuous(breaks = c(200000, 400000, 600000, 800000),
+                     labels = c("$200,000", "$400,000", "$600,000", "$800,000")) +
+  labs(y = "Price ($)",
+       x = "Year",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+# GRAPH OF SALES OVER TIME FOR NON-RESIDENTIAL ONLY
+brooklyn_sales_nonres |> 
+  group_by(year_of_sale) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price)) +
+  theme_minimal() +
+  geom_line(color = "#e9f2b8", linewidth = 2) +
+  geom_point(color = "black", size = 2) +
+  scale_x_continuous(breaks = c(2003, 2005, 2007,
+                                2009, 2011, 2013,
+                                2015, 2017)) + 
+  scale_y_continuous(breaks = c(400000, 800000, 1200000, 1600000, 2000000),
+                     labels = c("$400,000", "$800,000", "$1,200,000", "$1,600,000", "2,000,000")) +
+  labs(y = "Price ($)",
+       x = "Year",
+       caption = "Source: NYC Department of Finance") +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+  Next, I analyzed what building details correlated with changing residential building prices in Brooklyn. Despite increasing residential building prices over time, the average square feet still remained at the 2,000 square feet level for the time periods of 2003 to 2006, 2007 to 2010, and 2010 and 2017, meaning that the same sized residential buildings were generally getting more expensive in Brooklyn. Additionally, as seen in @fig-age-price, the most expensive buildings were not just the newest ones, but also included buildings that were 75 to 100 years old, while buildings from 40 to 60 years old were the cheapest on average. Additionally, semi-attached buildings were the cheapest residential buildings sold in Brooklyn.
+
+```{r}
+#| label: fig-age-price
+#| echo: false
+#| eval: true
+#| fig-cap: "Average Residential Building Price in Brooklyn by Building Age"
+
+brooklyn_sales_res |> 
+  mutate(building_age = year_of_sale - year_built) |> 
+  filter(sale_price < 4000000,
+         sale_price > 100,
+         building_age < 120,
+         building_age > 0) |> 
+  group_by(building_age) |> 
+  mutate(age_avg_price = mean(sale_price, na.rm = TRUE)) |> 
+  ggplot(aes(x = building_age, y = age_avg_price)) +
+  geom_point() +
+  geom_jitter() +
+  geom_smooth(method = lm) +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    x = "Building Age",
+    y = "Average Sale\nPrice",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+
+  Last of all, the neighborhoods with the most housing market activity in Brooklyn tend to have their residential buildings be sold at prices lower than the overall average building price. However, with the increased market activity of neighborhoods like Crown Heights and Park Slope, which has a higher average sale price than the overall average building sale price, from 2011 to 2017, it seems that popularity is shifting partially to more expensive areas. Overall though, the neighborhoods of Bedford Stuyvesant, East New York, Borough Park, and Bay Ridge appear to remain consistently popular due to price and usable square feet, as seen in @fig-sqft-sale.
+```{r}
+#| label: fig-table
+#| echo: false
+#| eval: true
+#| fig-cap: "Brooklyn Neighborhoods Ranked by Count of Residential Buildings Sold, 2003-2017"
+#| layout-ncol: 1
+
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    Average = mean(sale_price),
+    count = n()
+  ) |> 
+  filter(Average > 0,
+         count > 1) |> 
+  arrange(desc(count)) |> 
+  DT::datatable(
+    colnames = c(
+      'Neighborhood' = 'neighborhood',
+      'Count Sold' = 'count'
+    )
+  ) |> 
+  DT::formatRound(columns = 2, digits = 2) |> 
+  DT::formatCurrency(columns = "Average", currency = "$")
+```
+
+```{r}
+#| label: fig-sqft-sale
+#| echo: false
+#| eval: true
+#| fig-cap: "Brooklyn Neighborhood Building Sales by Average Square Feet and Average Sale Price"
+
+brooklyn_sales_res |> 
+  group_by(neighborhood) |> 
+  summarise(
+    avg_sale_n = mean(sale_price),
+    sq_avg = mean(land_sqft),
+    count = n()
+  ) |> 
+  filter(avg_sale_n > 0,
+         sq_avg < 10000) |> 
+  ggplot(aes(x = count, y = sq_avg)) +
+  geom_point(aes(color = avg_sale_n)) + 
+  geom_jitter(aes(color = avg_sale_n)) +
+  scale_x_continuous(label = scales::comma_format()) +
+  scale_y_continuous(label = scales::comma_format()) +
+  scale_color_continuous(
+    name = "Average Sale Price",
+    labels=c('$200,000','$400,000', '$600,000', '$800,000', '$1,000,000')) +
+  theme_minimal() +
+  labs(
+    x = "Count",
+    y = "Average\nSquare\nFeet",
+    caption = "Source: NYC Department of Finance"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+# Future Questions and Explorations
+With these explorations in mind, one field to research more is comparing the number of building sales and average sale price with other economic factors garnered from other datasets, such as unemployment and national GDP in the United States. Additionally, there is room to explore in building market trends in Brooklyn during COVID-19.
