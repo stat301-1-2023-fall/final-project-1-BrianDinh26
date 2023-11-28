@@ -449,7 +449,6 @@ brooklyn_sales_res |>
 
 In @fig-price-cuts-1, @fig-price-cuts-2, and @fig-price-cuts-3, the most common selling price in Brooklyn ranges from the $300k to $500k range, with this being the most prominent within @fig-price-cuts-1. However, with @fig-price-cuts-2, the number of homes sold at slightly above the $300k to $500k range significantly decreased, which could have caused the average price decreases for this time period. Within the 2011 to 2017 range, there has been a more subtle increase in properties being sold in the $700k to $1m range despite buildings in the $300k to $500k range being the most common, which could explain the immense increases in residential building prices over time.
 
-**NOTE: CONSIDER ADDING NON-RESIDENTIAL ANALYSIS OF BUILDINGS SOLD WITH PRICE CUTS**
 
 ## What affects the price for buildings?
 For the next part of my EDA, I wanted to look at what affects the price of buildings in Brooklyn. First off, I wanted to analyze the relationship between square feet and price using a scatter plot.
@@ -634,7 +633,7 @@ brooklyn_sales_res |>
 
 From @fig-table, it appears that the most popular neighborhoods are not the most expensive ones, with the only neighborhood appearing in both the top 10 for count of residential buildings sold and average building price being Park Slope. Rather, these active neighborhoods tend to be lower in price in comparison to the overall averages as seen in @fig-sale-line-1. This information may indicate that these neighborhoods might be quite active in terms of moving ownership or at least might not be seen as places to stay "permanently."
 
-second visualization thing goes here, another way of imagining square ft
+I also wanted to see if the average square feet of the buildings in these neighborhoods played a role in their popularity. In the following graph, each dot represents a neighborhood in Brooklyn.
 ```{r}
 #| label: fig-sqft-sale
 #| echo: false
@@ -653,7 +652,7 @@ brooklyn_sales_res |>
   geom_point() + 
   geom_jitter()
 ```
-
+One interesting observation is that the average square feet of many expensive (and less sold) neighborhoods is much lower than the average square feet of the neighborhoods that are sold more often. The more sold neighborhoods converge around the 1500 to 2500 average square feet range, which may indicate that having more space to live in can lead to more sales.
 
 Next, I wanted to see if the most popular neighborhoods changed depending on the time period.
 ```{r}
@@ -707,10 +706,6 @@ brooklyn_sales_res |>
 **THESE GRAPHS ARE UGLY FIX THEM AFTER**
 
 Looking at @fig-neighbor-bar-1, @fig-neighbor-bar-2, and @fig-neighbor-bar-3, the neighborhoods of Bedford Stuyvesant, East New York, Bay Ridge, and Borough Park are the most sold residential properties in Brooklyn, which makes sense as these properties are generally cheaper than the overall average prices for residential housing in Brooklyn. However, comparing @fig-neighbor-bar-1 and @fig-table, the neighborhood of Crown Heights appears to be an outlier, as it is relatively higher in price ($519,171.17) yet also getting increasingly popular.
-
-**consider expanding analysis to nonresidential buildings**
-
-
 
 # Conclusions
 
