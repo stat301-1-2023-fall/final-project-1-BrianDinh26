@@ -464,22 +464,29 @@ brooklyn_sales_res |>
 #changing price over time faceted by tax class type...?
 
 # FIGURE 1: Square ft, size, and # of units analysis.
-brooklyn_sales_res |> 
+brooklyn_sales_res |>
   filter(sale_price > 100,
-         gross_sqft > 15) |> 
-  ggplot(aes(x = sale_price, y = gross_sqft)) +
+         gross_sqft > 15) |>
+  ggplot(aes(y = sale_price, x = gross_sqft)) +
   geom_point(alpha = 0.5) +
   geom_jitter(alpha = 0.5) +
   geom_smooth() +
   theme_minimal() +
-  coord_cartesian(xlim = c(0, 4000000), ylim = c(0, 10000)) +
-  labs(
-    y = "Gross\nSquare Ft",
-    x = "Sale Price"
-  ) +
-  theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-  scale_x_continuous(label = scales::dollar_format()) +
-  scale_y_continuous(label = scales::comma_format())
+  coord_cartesian(ylim = c(0, 4000000), xlim = c(0, 10000)) +
+  labs(x = "Gross Square Ft",
+       y = "Sale\nPrice") +
+  theme(axis.title.y = element_text(
+    angle = 0,
+    vjust = 0.5,
+    margin = margin(
+      t = 0,
+      r = 10,
+      b = 0,
+      l = 0
+    )
+  )) +
+  scale_y_continuous(label = scales::dollar_format()) +
+  scale_x_continuous(label = scales::comma_format())
 
 # FIGURE 2: Proximity analysis, facet wrap graph?
 #need to filter out NA...
@@ -502,8 +509,18 @@ brooklyn_sales_res |>
     y = "Average\nSale\nPrice"
   ) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-  scale_y_continuous(label = scales::dollar_format()) +
-  scale_x_continuous(label = scales::comma_format())
+  scale_y_continuous(label = scales::dollar_format())
+
+brooklyn_sales_res |> 
+  filter(prox_code == c("1", "2", "3")) |> 
+  mutate(prox_code = as.factor(prox_code),
+         prox_code = fct_collapse(prox_code,
+                                  "Detached" = "1",
+                                  "Semi-attached" = "2",
+                                  "Attached" = "3")) |> 
+  group_by(prox_code) |> 
+  ggplot() +
+  geom_bar(aes(x = prox_code))
   
 # FIGURE 3: ZIP Code Analysis? Check if possible if they have same size or not (sq ft) and if there's a general thing.
 # Price per sq ft for each zip code?

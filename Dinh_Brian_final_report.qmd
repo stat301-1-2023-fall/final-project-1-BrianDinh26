@@ -452,7 +452,88 @@ In @fig-price-cuts-1, @fig-price-cuts-2, and @fig-price-cuts-3, the most common 
 **NOTE: CONSIDER ADDING NON-RESIDENTIAL ANALYSIS OF BUILDINGS SOLD WITH PRICE CUTS**
 
 ## What affects the price for buildings?
-For the next part of my EDA, I wanted to look at what affects the price of buildings in Brooklyn. 
+For the next part of my EDA, I wanted to look at what affects the price of buildings in Brooklyn. First off, I wanted to analyze the relationship between square feet and price using a scatter plot.
+
+```{r}
+#| label: fig-ft-price
+#| echo: false
+#| eval: true
+#| fig-cap: "Brooklyn Residential Building Sale Price compared to Gross Square Ft"
+
+brooklyn_sales_res |>
+  filter(sale_price > 1500,
+         gross_sqft > 15) |>
+  ggplot(aes(y = sale_price, x = gross_sqft)) +
+  geom_point(alpha = 0.5) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth() +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 4000000), xlim = c(0, 10000)) +
+  labs(x = "Gross Square Ft",
+       y = "Sale\nPrice") +
+  theme(axis.title.y = element_text(
+    angle = 0,
+    vjust = 0.5,
+    margin = margin(
+      t = 0,
+      r = 10,
+      b = 0,
+      l = 0
+    )
+  )) +
+  scale_y_continuous(label = scales::dollar_format()) +
+  scale_x_continuous(label = scales::comma_format())
+
+```
+
+In @fig-ft-price, looking at the linear fitting line, it appears that there is a general positive relationship between price and square feet, meaning that the more square feet a property has, the more expensive it is, which was expected.
+
+Another variable I wanted to look at was `prox_code`, which identifies the proximity of the property to another property. `prox_code` is split into three categories: detached, semi-attached, and attached.
+
+```{r}
+#| label: fig-prox-price
+#| echo: false
+#| eval: true
+#| fig-cap: "Distribution of Residential Buildings by Proximity Code"
+#| fig-subcap:
+#|   - "Yearly Average Residential Building Prices in Brooklyn, Split by Proximity Codes"
+#|   - "Count of Residential Buildings Sold in Brooklyn from 2003-2017"
+#| layout-ncol: 1
+
+#first figure
+brooklyn_sales_res |> 
+  filter(prox_code == c("1", "2", "3")) |> 
+  mutate(prox_code = as.factor(prox_code),
+         prox_code = fct_collapse(prox_code,
+                                 "Detached" = "1",
+                                 "Semi-attached" = "2",
+                                 "Attached" = "3")) |> 
+  group_by(year_of_sale, prox_code) |> 
+  mutate(yearly_avg_price = mean(sale_price)) |> 
+  ggplot(aes(x = year_of_sale, y = yearly_avg_price, color = prox_code)) +
+  geom_line() +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Average\nSale\nPrice"
+  ) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  scale_y_continuous(label = scales::dollar_format())
+
+#second figure
+brooklyn_sales_res |> 
+  filter(prox_code == c("1", "2", "3")) |> 
+  mutate(prox_code = as.factor(prox_code),
+         prox_code = fct_collapse(prox_code,
+                                  "Detached" = "1",
+                                  "Semi-attached" = "2",
+                                  "Attached" = "3")) |> 
+  group_by(prox_code) |> 
+  ggplot() +
+  geom_bar(aes(x = prox_code))
+```
+
+@fig-prox-price-1 reveals that on average, detached and attached buildings were around the same price points from 2003 to 2017, while semi-attached buildings tend to be cheaper than other properties. However, in @fig-prox-price-2, semi-attached buildings are the 2nd most sold, with attached buildings being the highest and detached buildings being the least sold. This information may indicate that the cheapness of semi-attached properties could result in more transfers of properties or sellings.
 
 ## What neighborhoods are the most popular in Brooklyn?
 
